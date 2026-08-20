@@ -1,3 +1,6 @@
+# ignore TivaWare SDK
+ti_sdk/
+
 # Prerequisites
 *.d
 
