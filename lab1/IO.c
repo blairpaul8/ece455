@@ -1,4 +1,7 @@
 #include "IO.h"
+
+#include "stdbool.h"
+#include <stdint.h>
 #include "tm4c123gh6pm.h"
 
 // Place the definition for bit specific addressing here.
@@ -12,16 +15,26 @@
 void LEDs_off(void) {}
 
 // Should return the button states
-uint32_t pushbuttons(void) {
+uint32_t left_push_button(void) {
 
-  // Set to 42 because the compiler expects a return value.
-  // Your function only needs to return a value denoting the button states
-  // rather than the answer to life, the universe, and everything...
-  return 42;
+  // read the state of GPIO Pin 0
+  uint32_t ret_val = 42;
+  return ret_val;
 }
 
 // Turns Red LED On
-void Red_on(void) {}
+void Red_on(void) {
+
+  // Set Pin 1 to high to turn on LED
+  //
+  GPIO_PORTF_DATA_R |= (1 << 1);
+}
+
+void Red_off(void) {
+  // Set Pin 1 to low to turn on LED
+  //
+  GPIO_PORTF_DATA_R &= ~(1 << 1);
+}
 
 // Turns Blue LED On
 void Blue_on(void) {}
