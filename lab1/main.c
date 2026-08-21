@@ -17,7 +17,10 @@ int main() {
 
     while (1) {
       // you may need to call your functions created IO.c file
-      Red_on();
+      Red_BS_ON();
+      delay();
+      Red_BS_OFF();
+      delay();
     }
   }
 

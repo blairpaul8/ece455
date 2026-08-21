@@ -26,7 +26,20 @@ void Blue_on(void);
 // Turn on Green LED
 void Green_on(void);
 
+// Turn off Green LED
+void Green_off(void);
+
 // Turn on All LEDs
-void All_on(void);
+void ALL_on(void);
+
+void delay(void);
+
+void Green_BS_ON(void);
+
+void Green_BS_OFF(void);
+
+void Red_BS_ON(void);
+
+void Red_BS_OFF(void);
 
 #endif
