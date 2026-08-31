@@ -14,6 +14,12 @@ uint32_t left_push_button(void);
 // returns the state of the push button on PF4
 uint32_t right_push_button(void);
 
+//
+void External_Led_on(void);
+
+//
+void External_Led_off(void);
+
 // Turn on Red LED
 void Red_on(void);
 
@@ -22,6 +28,9 @@ void Red_off(void);
 
 // Turn on Blue LED
 void Blue_on(void);
+
+// Turn off Blue LED
+void Blue_off(void);
 
 // Turn on Green LED
 void Green_on(void);
@@ -41,5 +50,9 @@ void Green_BS_OFF(void);
 void Red_BS_ON(void);
 
 void Red_BS_OFF(void);
+
+void toggle_red(void);
+void toggle_blue(void);
+void toggle_green(void);
 
 #endif

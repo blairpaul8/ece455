@@ -8,12 +8,22 @@
 // Place the definition for bit specific addressing here.
 // The below example is for PortA pin 5
 // #define PA5 (*((volatile uint32_t *)0x40004080))
+#define PF1 (*((volatile uint32_t *)0x40025008))
+#define PF3 (*((volatile uint32_t *)0x40025020))
 
 // Place your pushbutton and led functions here
 // Should return the button states
+
+// return the state of left push button
 uint32_t left_push_button(void) {
-  // TODO: Need to implement a function for left and right push buttons
-  return 42;
+  uint32_t state = (GPIO_PORTF_DATA_R & 0x10) ? 1 : 0;
+  return state;
+}
+
+// return the state of right push button
+uint32_t right_push_button(void) {
+  uint32_t state = (GPIO_PORTF_DATA_R & 0x01) ? 1 : 0;
+  return state;
 }
 
 // Part of PART 3B
@@ -26,15 +36,29 @@ void LEDs_off(void) {
 
 // Turns Red LED On
 // PF1
+void External_Led_on(void) {
+
+  // Set Pin 1 to high to turn on LED
+  GPIO_PORTF_DATA_R |= (1 << 2);
+}
+
+// Turn External Led off
+// PF2
+void External_Led_off(void) {
+  // Set Pin 1 to high to turn on LED
+  GPIO_PORTF_DATA_R &= ~(1 << 2);
+}
+
+// Turns Red LED On
+// PF1
 void Red_on(void) {
 
   // Set Pin 1 to high to turn on LED
-  //
   GPIO_PORTF_DATA_R |= (1 << 1);
 }
 
 // Turn Red Led off
-//
+// PF1
 void Red_off(void) {
   // Set Pin 1 to low to turn on LED
   GPIO_PORTF_DATA_R &= ~(1 << 1);
@@ -44,41 +68,34 @@ void Red_off(void) {
 // PF2
 void Blue_on(void) {
   // Set Pin 2 to high to turn on LED
-  //
   GPIO_PORTF_DATA_R |= (1 << 2);
 }
 
-// Turns ALL LED On
-//
-void ALL_on(void) {
-  GPIO_PORTF_DATA_R |= (1 << 1);
-  GPIO_PORTF_DATA_R |= (1 << 2);
-  GPIO_PORTF_DATA_R |= (1 << 3);
+// Turns Blue LED Off
+// PF2
+void Blue_off(void) {
+  // Set Pin 2 to high to turn on LED
+  GPIO_PORTF_DATA_R &= ~(1 << 2);
 }
 
 // Turns Green LED On
 // PF3
 void Green_on(void) {
-
   // Set Pin 3 to high to turn on LED
-  //
   GPIO_PORTF_DATA_R |= (1 << 3);
 }
 
 // Turns Green LED Off
 // PF3
 void Green_off(void) {
-
   // Set Pin 3 to high to turn on LED
-  //
   GPIO_PORTF_DATA_R &= ~(1 << 3);
 }
 
 // A General Purpose Delay
 void delay(void) {
-  // TODO: I think we can write our own delay function with the clock registers
-  // or a timer instead of this function.
-  // Using this in main to test blinking leds.
+  // TODO: I think we can write our own delay function with the clock registers?
+  // Need to use systick instead
   SysCtlDelay(SysCtlClockGet() / 6);
 }
 
@@ -89,21 +106,48 @@ void delay(void) {
 // A Bit Specific demonstration for Green LED
 void Green_BS_ON(void) {
   // index the bits like an array
-  GPIO_PORTF_DATA_BITS_R[1 << 3] = 0xFF;
+  PF3 = 0xFF;
 }
 
 void Green_BS_OFF(void) {
   // index the bits like an array
-  GPIO_PORTF_DATA_BITS_R[1 << 3] = 0x00;
+  PF3 = 0x00;
 }
 
 // A Bit Specific demonstration for Red LED
 void Red_BS_ON(void) {
   // index the bits like an array
-  GPIO_PORTF_DATA_BITS_R[1 << 1] = 0xFF;
+  PF1 = 0xFF;
 }
 
 void Red_BS_OFF(void) {
   // index the bits like an array
-  GPIO_PORTF_DATA_BITS_R[1 << 1] = 0x00;
+  PF1 = 0x00;
+}
+
+void toggle_red(void) {
+  while (1) {
+    Red_on();
+    delay();
+    Red_off();
+    delay();
+  }
+}
+
+void toggle_blue(void) {
+  while (1) {
+    Blue_on();
+    delay();
+    Blue_off();
+    delay();
+  }
+}
+
+void toggle_green(void) {
+  while (1) {
+    Green_on();
+    delay();
+    Green_off();
+    delay();
+  }
 }
