@@ -8,6 +8,9 @@
 // Turns off all Leds
 void LEDs_off(void);
 
+// Initialize PortA for external led
+void PortA_init(void);
+
 // returns the state of the push button on PF0
 uint32_t left_push_button(void);
 
@@ -41,7 +44,14 @@ void Green_off(void);
 // Turn on All LEDs
 void ALL_on(void);
 
-void delay(void);
+// Initialize Systick for delay function
+void systick_init(void);
+
+// ticks to wait
+void systick_wait(uint32_t delay);
+
+// delay for 1 millisecond
+void delay_1ms(uint32_t);
 
 void Green_BS_ON(void);
 
