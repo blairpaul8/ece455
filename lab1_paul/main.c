@@ -8,7 +8,7 @@
 #include "tm4c123gh6pm.h"
 
 // Change this number to the current part
-#define PART 1 // 1 for PART3B, 2 for PART3C , 3 for PART4
+#define PART 2 // 1 for PART3B, 2 for PART3C , 3 for PART4
 
 int main() {
   PortF_Init();
@@ -18,132 +18,130 @@ int main() {
 
     while (1) {
       // you may need to call your functions created IO.c file
-      while (left_push_button() == 1 && right_push_button() == 1) {
-        if (left_push_button() == 0 || right_push_button() == 0) {
+      while (push_button_state(LEFT) == 1 && push_button_state(RIGHT) == 1) {
+        if (push_button_state(LEFT) == 0 || push_button_state(RIGHT) == 0) {
           control_led(RED, OFF);
           break;
         }
-        toggle_red();
+        toggle_led(RED);
       }
-      while ((left_push_button() == 0) && (right_push_button() == 0)) {
-        LEDs_off();
-        delay_1ms(250);
-        delay_1ms(250);
-        ALL_on();
-        if (left_push_button() == 1 || right_push_button() == 1) {
-          LEDs_off();
+      while ((push_button_state(LEFT) == 0) &&
+             (push_button_state(RIGHT) == 0)) {
+
+        control_all_leds(OFF);
+        delay_1ms(500);
+        control_all_leds(ON);
+
+        if (push_button_state(LEFT) == 1 || push_button_state(RIGHT) == 1) {
+          control_all_leds(OFF);
           break;
         }
-        delay_1ms(250);
-        delay_1ms(250);
-        Green_off();
-        if (left_push_button() == 1 || right_push_button() == 1) {
-          LEDs_off();
+
+        delay_1ms(500);
+
+        control_led(GREEN, OFF);
+
+        if (push_button_state(LEFT) == 1 || push_button_state(RIGHT) == 1) {
+          control_all_leds(OFF);
           break;
         }
-        delay_1ms(250);
-        delay_1ms(250);
-        Blue_off();
-        Green_on();
-        if (left_push_button() == 1 || right_push_button() == 1) {
-          LEDs_off();
+
+        delay_1ms(500);
+        control_led(BLUE, OFF);
+        control_led(GREEN, ON);
+
+        if (push_button_state(LEFT) == 1 || push_button_state(RIGHT) == 1) {
+          control_all_leds(OFF);
           break;
         }
-        delay_1ms(250);
-        delay_1ms(250);
-        LEDs_off();
-        delay_1ms(250);
-        delay_1ms(250);
+
+        delay_1ms(500);
+        control_all_leds(OFF);
+
+        delay_1ms(500);
       }
 
-      if (left_push_button() == 0 && right_push_button() == 1) {
-        Green_on();
+      if (push_button_state(LEFT) == 0 && push_button_state(RIGHT) == 1) {
+        control_led(GREEN, ON);
       } else {
-        Green_off();
+        control_led(GREEN, OFF);
       }
 
-      if (right_push_button() == 0 && left_push_button() == 1) {
-        Blue_on();
+      if (push_button_state(RIGHT) == 0 && push_button_state(LEFT) == 1) {
+        control_led(BLUE, ON);
       } else {
-        Blue_off();
+        control_led(BLUE, OFF);
       }
     }
-    */
+  } else if (PART == 2) { // Should Execute only for PART 3C
+
+    while (1) {
+      // Write the code that demonstrate PART3B functionality
+
+      control_BS_led(RED, ON);
+      control_BS_led(GREEN, OFF);
+
+      delay_1ms(1000);
+
+      control_BS_led(GREEN, ON);
+      control_BS_led(RED, OFF);
+
+      delay_1ms(1000);
+
+      while (push_button_state(LEFT) == 0 && push_button_state(RIGHT) == 1) {
+        control_all_leds(OFF);
+        delay_1ms(1000);
+
+        // red on green off 0b01
+        control_BS_led(RED, ON);
+        delay_1ms(1000);
+
+        // red off green on 0b10
+        control_BS_led(RED, OFF);
+        control_BS_led(GREEN, ON);
+        delay_1ms(1000);
+
+        // red on and green on 0b11
+        control_BS_led(RED, ON);
+        delay_1ms(1000);
+      }
+
+      while (push_button_state(LEFT) == 1 && push_button_state(RIGHT) == 0) {
+        // off is 0b00
+        control_all_leds(OFF);
+        delay_1ms(1000);
+
+        // red on and green on 0b11
+        control_BS_led(GREEN, ON);
+        control_BS_led(RED, ON);
+        delay_1ms(1000);
+
+        // red off green on 0b10
+        control_BS_led(RED, OFF);
+        control_BS_led(GREEN, ON);
+        delay_1ms(1000);
+
+        // red on green off 0b01
+        control_BS_led(GREEN, OFF);
+        control_BS_led(RED, ON);
+        delay_1ms(1000);
+      }
+    }
   }
-  /*
-    else if (PART == 2) { // Should Execute only for PART 3C
 
-      while (1) {
-        // Write the code that demonstrate PART3B functionality
+  else if (PART == 3) { // Should Execute only for PART 4
+    //
+    PortA_init();
 
-        // while ((left_push_button() == 0 && right_push_button() == 0) ||
-        //       (left_push_button() == 1 && right_push_button() == 1)) {
-        Red_BS_ON();
-        Green_BS_OFF();
-        delay_1ms(250);
-        delay_1ms(250);
-        Green_BS_ON();
-        Red_BS_OFF();
-        delay_1ms(250);
-        delay_1ms(250);
-        //}
-
-        while (left_push_button() == 0 && right_push_button() == 1) {
-          // off is 0b00
-          LEDs_off();
-          delay_1ms(250);
-          // red on green off 0b01
-          Red_BS_ON();
-          delay_1ms(250);
-          delay_1ms(250);
-          // red off green on 0b10
-          Red_BS_OFF();
-          Green_BS_ON();
-          delay_1ms(250);
-          delay_1ms(250);
-          // red on and green on 0b11
-          Red_BS_ON();
-          delay_1ms(250);
-          delay_1ms(250);
-        }
-
-        while (left_push_button() == 1 && right_push_button() == 0) {
-          // off is 0b00
-          LEDs_off();
-          delay_1ms(250);
-          // red on and green on 0b11
-          Green_BS_ON();
-          Red_BS_ON();
-          delay_1ms(250);
-          delay_1ms(250);
-          // red off green on 0b10
-          Red_BS_OFF();
-          Green_BS_ON();
-          delay_1ms(250);
-          delay_1ms(250);
-          // red on green off 0b01
-          Green_BS_OFF();
-          Red_BS_ON();
-          delay_1ms(250);
-          delay_1ms(250);
-        }
-      }
+    while (1) {
+      // Write the code that demonstrate PART4 functionality
+      control_external_led(ON);
+      delay_1ms(500);
+      control_external_led(OFF);
+      delay_1ms(500);
     }
-
-    else if (PART == 3) { // Should Execute only for PART 4
-      //
-      PortA_init();
-
-      while (1) {
-        // Write the code that demonstrate PART4 functionality
-        External_Led_on();
-        delay_1ms(250);
-        External_Led_off();
-        delay_1ms(250);
-      }
-    }
-    */
+  }
   // Shouldn't reach unless you set an incorrect value for LAB_PART
-}
-return 0;
+  else
+    return 0;
 }

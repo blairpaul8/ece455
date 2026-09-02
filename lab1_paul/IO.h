@@ -1,37 +1,19 @@
 #ifndef _IO_h
 #define _IO_h
-#include "stdint.h"
+#include <stdint.h>
 
 // Place prototypes for your pushbutton and LED functions here
 // you may need to add more function here
+// Initialize PortA for external led
 
 enum LedState { OFF, ON };
 
 enum LedPin { RED = 1, BLUE = 2, GREEN = 3 };
 
-// Turn on All LEDs
-void leds_on(void);
+enum PushButton { LEFT, RIGHT };
 
-// Turns off all Leds
-void leds_off(void);
-
-// Initialize PortA for external led
+// Initialize Port A for external Led
 void PortA_init(void);
-
-// returns the state of the push button on PF0
-uint32_t left_push_button(void);
-
-// returns the state of the push button on PF4
-uint32_t right_push_button(void);
-
-//
-void External_Led_on(void);
-
-//
-void External_Led_off(void);
-
-// Contol led state
-void control_led(enum LedPin pin, enum LedState state);
 
 // Initialize Systick for delay function
 void systick_init(void);
@@ -42,16 +24,22 @@ void systick_wait(uint32_t delay);
 // delay for 1 millisecond
 void delay_1ms(uint32_t);
 
-void Green_BS_ON(void);
+// returns the state of the push button
+uint32_t push_button_state(enum PushButton button);
 
-void Green_BS_OFF(void);
+// Control all Leds based on state passed in
+void control_all_leds(enum LedState state);
 
-void Red_BS_ON(void);
+// Control external Led attched to PA5
+void control_external_led(enum LedState state);
 
-void Red_BS_OFF(void);
+// Contol individual led state
+void control_led(enum LedPin pin, enum LedState state);
 
-void toggle_red(void);
-void toggle_blue(void);
+// Control led with bit specific addressing
+void control_BS_led(enum LedPin pin, enum LedState state);
+
+// Toggle specific led on and off
 void toggle_led(enum LedPin led);
 
 #endif
