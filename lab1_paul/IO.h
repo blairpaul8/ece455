@@ -5,8 +5,15 @@
 // Place prototypes for your pushbutton and LED functions here
 // you may need to add more function here
 
+enum LedState { OFF, ON };
+
+enum LedPin { RED = 1, BLUE = 2, GREEN = 3 };
+
+// Turn on All LEDs
+void leds_on(void);
+
 // Turns off all Leds
-void LEDs_off(void);
+void leds_off(void);
 
 // Initialize PortA for external led
 void PortA_init(void);
@@ -23,26 +30,8 @@ void External_Led_on(void);
 //
 void External_Led_off(void);
 
-// Turn on Red LED
-void Red_on(void);
-
-// Turn off Red LED
-void Red_off(void);
-
-// Turn on Blue LED
-void Blue_on(void);
-
-// Turn off Blue LED
-void Blue_off(void);
-
-// Turn on Green LED
-void Green_on(void);
-
-// Turn off Green LED
-void Green_off(void);
-
-// Turn on All LEDs
-void ALL_on(void);
+// Contol led state
+void control_led(enum LedPin pin, enum LedState state);
 
 // Initialize Systick for delay function
 void systick_init(void);
@@ -63,6 +52,6 @@ void Red_BS_OFF(void);
 
 void toggle_red(void);
 void toggle_blue(void);
-void toggle_green(void);
+void toggle_led(enum LedPin led);
 
 #endif

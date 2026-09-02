@@ -28,13 +28,24 @@ uint32_t right_push_button(void) {
   uint32_t state = (GPIO_PORTF_DATA_R & 0x01) ? 1 : 0;
   return state;
 }
+/***********************
+ *                     *
+ *   Part of PART 3B   *
+ *                     *
+ **********************/
 
-// Part of PART 3B
-// Turns off all LEDs
-void LEDs_off(void) {
-  GPIO_PORTF_DATA_R &= ~(1 << 1);
-  GPIO_PORTF_DATA_R &= ~(1 << 2);
-  GPIO_PORTF_DATA_R &= ~(1 << 3);
+// Turn on all Leds
+void leds_on(void) {
+  control_led(RED, ON);
+  control_led(BLUE, ON);
+  control_led(GREEN, ON);
+}
+
+// Turns off all Leds
+void leds_off(void) {
+  control_led(RED, OFF);
+  control_led(BLUE, OFF);
+  control_led(GREEN, OFF);
 }
 
 void PortA_init(void) {
@@ -51,8 +62,8 @@ void PortA_init(void) {
   GPIO_PORTA_DIR_R |= 0x20;
 }
 
-// Turns Red LED On
-// PF1
+// Control external Led
+// PA5
 void External_Led_on(void) {
 
   // Set Pin 5 to high to turn on LED
@@ -66,47 +77,14 @@ void External_Led_off(void) {
   GPIO_PORTA_DATA_R &= ~(1 << 5);
 }
 
-// Turns Red LED On
-// PF1
-void Red_on(void) {
-
-  // Set Pin 1 to high to turn on LED
-  GPIO_PORTF_DATA_R |= (1 << 1);
-}
-
-// Turn Red Led off
-// PF1
-void Red_off(void) {
-  // Set Pin 1 to low to turn on LED
-  GPIO_PORTF_DATA_R &= ~(1 << 1);
-}
-
-// Turns Blue LED On
-// PF2
-void Blue_on(void) {
-  // Set Pin 2 to high to turn on LED
-  GPIO_PORTF_DATA_R |= (1 << 2);
-}
-
-// Turns Blue LED Off
-// PF2
-void Blue_off(void) {
-  // Set Pin 2 to high to turn on LED
-  GPIO_PORTF_DATA_R &= ~(1 << 2);
-}
-
-// Turns Green LED On
-// PF3
-void Green_on(void) {
-  // Set Pin 3 to high to turn on LED
-  GPIO_PORTF_DATA_R |= (1 << 3);
-}
-
-// Turns Green LED Off
-// PF3
-void Green_off(void) {
-  // Set Pin 3 to high to turn on LED
-  GPIO_PORTF_DATA_R &= ~(1 << 3);
+// Control LED state
+// param: pin is the number of the pin you want to control
+// param: state is the state you want to set the pin to (High or Low)
+//
+void control_led(enum LedPin pin, enum LedState state) {
+  // Set pin based on state passed in
+  (state == ON) ? (GPIO_PORTF_DATA_R |= (1 << pin))
+                : (GPIO_PORTF_DATA_R &= ~(1 << pin));
 }
 
 void systick_init(void) {
@@ -170,22 +148,22 @@ void Red_BS_OFF(void) {
 }
 
 void toggle_red(void) {
-  Red_on();
+  control_led(RED, ON);
   delay_1ms(500);
-  Red_off();
+  control_led(RED, OFF);
   delay_1ms(500);
 }
 
 void toggle_blue(void) {
-  Blue_on();
+  control_led(BLUE, ON);
   delay_1ms(250);
-  Blue_off();
+  control_led(BLUE, OFF);
   delay_1ms(250);
 }
 
-void toggle_green(void) {
-  Green_on();
+void toggle_led(enum LedPin led) {
+  control_led(led, ON);
   delay_1ms(500);
-  Green_off();
+  control_led(led, OFF);
   delay_1ms(500);
 }
