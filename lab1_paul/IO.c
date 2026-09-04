@@ -4,6 +4,21 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 
+// Note: Utilized ternary operator ?
+// in place of doing an if else statement in
+// a number of these functions.
+//
+// (some condition) ? executed if true : else false excute this
+//
+// This is the same as doing
+//
+// if (some condition) {
+//  execute this
+// }
+// else {
+//  execute this instead
+// }
+
 // Systick Values
 #define CLOCK_HZ 16000000
 #define CYCLES_PER_MS (CLOCK_HZ / 1000)
@@ -68,14 +83,14 @@ void delay_1ms(uint32_t delay) {
 // Should return the button states
 
 // return the state of the specified push button
-uint32_t push_button_state(enum PushButton button) {
+uint32_t push_buttons(enum PushButton button) {
   uint32_t state = 0xFF; // Initialize to invalid value
 
-  if (button == LEFT) {
-    state = (GPIO_PORTF_DATA_R & 0x10) ? 1 : 0;
+  if (button == SW1) {
+    state = (GPIO_PORTF_DATA_R & SW1_PRESSED) ? 1 : 0;
 
-  } else if (button == RIGHT) {
-    state = (GPIO_PORTF_DATA_R & 0x01) ? 1 : 0;
+  } else if (button == SW2) {
+    state = (GPIO_PORTF_DATA_R & SW2_PRESSED) ? 1 : 0;
   }
 
   return state;
@@ -88,6 +103,8 @@ uint32_t push_button_state(enum PushButton button) {
  **********************/
 
 // Control all Leds based on state passed in
+// Utilizing one function to control all leds
+// with a single state
 void control_all_leds(enum LedState state) {
   if (state == ON) {
     control_led(RED, ON);
@@ -102,6 +119,7 @@ void control_all_leds(enum LedState state) {
 }
 
 // Control external Led
+// Based on state passed in
 // PA5
 void control_external_led(enum LedState state) {
   // Set Pin A5 base on state passed in
@@ -110,7 +128,8 @@ void control_external_led(enum LedState state) {
 }
 
 // Control LED state
-//
+// Utilizing one function to control each led
+// by passing a pin and state into the function
 void control_led(enum LedPin pin, enum LedState state) {
   // Set pin based on state passed in
   (state == ON) ? (GPIO_PORTF_DATA_R |= (1 << pin))
@@ -119,19 +138,17 @@ void control_led(enum LedPin pin, enum LedState state) {
 
 // Part of Part 3C
 // Bit Specific Addressing
-//
+// Single bit specific addressing function used
+// based on the pin and state passed in.
 void control_BS_led(enum LedPin pin, enum LedState state) {
-  // index the bits like an array
-  switch (pin) {
-  case RED:
+  if (pin == RED) {
+
+    // either set the bit high or low based on state passed in
     (state == ON) ? (PF1 = 0xFF) : (PF1 = 0x00);
-    break;
-  case GREEN:
+
+  } else if (pin == GREEN) {
+
     (state == ON) ? (PF3 = 0xFF) : (PF3 = 0x00);
-    break;
-  case BLUE:
-    // Don't need to support BS addressing for Blue
-    break;
   }
 }
 
