@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 // Change this number to the current part
-#define PART 3 // 1 for PART3B, 2 for PART3C , 3 for PART4
+#define PART 1 // 1 for PART3B, 2 for PART3C , 3 for PART4
 
 #define SWITCH_1 push_buttons(SW1)
 #define SWITCH_2 push_buttons(SW2)
