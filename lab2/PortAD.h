@@ -7,6 +7,7 @@ enum PushButton { SW1, SW2 };
 
 void PortA_Init(void);
 void PortD_Init(void);
+void PortF_Init(void);
 uint32_t pushbuttons(enum PushButton button);
 
 #endif

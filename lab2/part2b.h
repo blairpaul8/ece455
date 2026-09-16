@@ -3,16 +3,15 @@
 
 #include <stdint.h>
 
-// **need to change pin numbers
 #define RED 2
 #define YELLOW 3
 #define GREEN 4
 
-// same with switches
-#define SW1 1 // PD1
-#define SW2 2 // PD2
-#define SW1_PRESSED 0x01
-#define SW2_PRESSED 0x10
+// TODO: Switch SW1/2 back to PD1/2
+#define SW1 0 // PD1
+#define SW2 4 // PD2
+#define SW1_PRESSED 0x10
+#define SW2_PRESSED 0x01 // Need to update these this is for PF0/4
 
 void led_on(uint32_t pin);
 
