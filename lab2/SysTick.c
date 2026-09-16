@@ -86,7 +86,7 @@ void SysTick_Delay1s_25MHz(void) {
   }
 }
 
-// Interrupt handling routine should be writtne here
+// Interrupt handling routine should be written here
 void SysTick_Handler(void) {
   g_handler_calls++;
 

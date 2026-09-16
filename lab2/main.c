@@ -28,6 +28,45 @@ int main() {
       led_on(RED);
       SysTick_Delay1s_16MHz();
       led_off(RED);
+
+      if(SW1_PRESSED == 1 && SW2_PRESSED == 1){
+
+        led_on(GREEN);
+        SysTick_Delay1s_16MHz();
+        led_off(GREEN);
+      } else if (SW1_PRESSED == 0 && SW2_PRESSED == 1){
+        led_on(RED);
+        SysTick_Delay1s_16MHz();
+        led_off(RED);
+      } else if (SW1_PRESSED == 1 && SW2_PRESSED == 0){
+
+        // turn on RED, YELLOW, GREEN
+        led_on(RED);
+        SysTick_Delay1s_16MHz();
+        led_on(YELLOW);
+        SysTick_Delay1s_16MHz();
+        led_on(GREEN);
+        SysTick_Delay1s_16MHz();
+        
+        //all led off
+        led_off(RED);
+        led_off(YELLOW);
+        led_off(GREEN);
+
+      } else if (SW1_PRESSED == 0 && SW2_PRESSED == 0){
+        //flash on RYG 
+        led_on(RED);
+        led_on(YELLOW);
+        led_on(GREEN);
+
+        SysTick_Delay1s_16MHz();
+
+        //turn all off 
+        led_off(RED);
+        led_off(YELLOW);
+        led_off(GREEN);
+
+      }
     }
   }
 
