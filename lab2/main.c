@@ -1,7 +1,9 @@
 #include "PortAD.h"
 #include "SysTick.h"
 #include "PLL.h"
+#include "part2b.h"
 #include "stdint.h"
+#include <stdint.h>
 // #include "tm4c123gh6pm.h"
 
 // Change this number to the current part of the lab you are working on
@@ -44,11 +46,31 @@ int main() {
   else if (LAB_PART == 4) {
     // This should demonstrate the functionality for Part 3B
     // Write the code below for "1011" Sequence detectror - without overalapping
+
   }
 
   else if (LAB_PART == 5) {
     // This should demonstrate the functionality for Part 3B
     // Write the code below for "1011" Sequence detectror - with overalapping
+    uint8_t pattern = 0;
+    uint8_t input = 0;
+    if (switch_state(SW1)) {
+      input = 0;
+    } else if (switch_state(SW2)) {
+      input = 1;
+    }
+
+    pattern <<= 1;
+    pattern |= input;
+
+    // & pattern with 0x0F to only check bottom 4 bits.
+    if ((pattern & 0x0F) == 11) {
+      led_off(RED);
+      led_on(GREEN);
+    } else {
+      led_off(GREEN);
+      led_on(RED);
+    }
   }
 
   // Shouldn't reach unless you set an incorrect value for LAB_PART
