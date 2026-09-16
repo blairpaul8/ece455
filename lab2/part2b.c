@@ -25,6 +25,10 @@ uint32_t switch_state(uint32_t switch_num) {
 
 void count_up() {
   // all off 000   0
+  led_off(RED);
+  led_off(YELLOW);
+  led_off(GREEN);
+
   SysTick_Delay1s_25MHz();
 
   // red on 001   1

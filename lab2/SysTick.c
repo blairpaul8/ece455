@@ -89,10 +89,9 @@ void SysTick_Delay1s_25MHz(void) {
 // Interrupt handling routine should be written here
 void SysTick_Handler(void) {
   g_handler_calls++;
-
-  if (switch_state(SW1)) {
-    count_down();
-  } else if (switch_state(SW2)) {
+  if (switch_state(SW1) == 0) {
+    count_up();
+  } else if (switch_state(SW2) == 0) {
     // count down
   } else {
     uint32_t red = g_handler_calls % RED_TICKS;
@@ -102,5 +101,7 @@ void SysTick_Handler(void) {
     (red < 100) ? led_on(RED) : led_off(RED);
     (yellow < 100) ? led_on(YELLOW) : led_off(YELLOW);
     (green < 100) ? led_on(GREEN) : led_off(GREEN);
+    
   }
+
 }
