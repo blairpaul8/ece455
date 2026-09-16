@@ -6,6 +6,7 @@
 
 #define CLOCK_25MHZ 25000000
 #define CYCLES_PER_MS_25MHZ 25000
+#define CLOCK_16MHZ 16000000
 
 #define RED_TICKS 200 // 1s on 1s off > 2000ms / 10ms
 #define YELLOW_TICKS 300
@@ -48,7 +49,7 @@ static void SysTick_Delay100us_16MHz(void) {
   // Use the Systick Timer to generate a 1ms delay
 
   // Choose the number of clock ticks to wait
-  // NVIC_ST_RELOAD_R = ;
+  NVIC_ST_RELOAD_R = (CLOCK_16MHZ * 0.0001) -1;
 
   NVIC_ST_CURRENT_R = 0; // Any value written to write clears it
   while ((NVIC_ST_CTRL_R & 0x00010000) == 0) {
@@ -57,7 +58,11 @@ static void SysTick_Delay100us_16MHz(void) {
 
 // Write code to generate a 1 sec delay
 // Your code should call SysTick_Delay1ms()
-void SysTick_Delay1s_16MHz(void) {}
+void SysTick_Delay1s_16MHz(void) {
+  for(int i = 0; i < 10000; i++){
+    SysTick_Delay100us_16MHz();
+  }
+}
 
 // Write code to generate 1ms delay assuming a clock speed of 25MHz
 static void SysTick_Delay100us_25MHz(void) {

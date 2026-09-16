@@ -3,12 +3,14 @@
 
 #include <stdint.h>
 
-#define RED 1
-#define YELLOW 2
-#define GREEN 3
+// **need to change pin numbers
+#define RED 2
+#define YELLOW 3
+#define GREEN 4
 
-#define SW1 5
-#define SW2 6
+//same with switches
+#define SW1 1 //PD1
+#define SW2 2 //PD2
 #define SW1_PRESSED 0x01
 #define SW2_PRESSED 0x10
 
