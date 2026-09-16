@@ -16,6 +16,7 @@ int main() {
   // call the port initialization function
   PortA_Init();
   PortD_Init();
+  PortF_Init();
 
   if (LAB_PART == 1) {
     // This should demonstrate the functionality for Part 2A
@@ -26,26 +27,21 @@ int main() {
       // call appropriate delay
       // GPIO_PORTA_DATA_R &=  	// Turn off when not testing
       //
-      if ((switch_state(SW1) == 1)) {
-        led_on(GREEN);
-        SysTick_Delay1s_16MHz();
-        led_off(GREEN);
-        SysTick_Delay1s_16MHz();
-      }
-      /*
-      if ((switch_state(SW1) == 1) && SW2_PRESSED == 1) {
+      if (switch_state(SW1) == 1 && switch_state(SW2) == 1) {
 
         led_on(GREEN);
         SysTick_Delay1s_16MHz();
         led_off(GREEN);
+        SysTick_Delay1s_16MHz();
 
-      } else if (SW1_PRESSED == 0 && SW2_PRESSED == 1) {
+      } else if (switch_state(SW1) == 0 && switch_state(SW2) == 1) {
 
         led_on(RED);
         SysTick_Delay1s_16MHz();
         led_off(RED);
+        SysTick_Delay1s_16MHz();
 
-      } else if (SW1_PRESSED == 1 && SW2_PRESSED == 0) {
+      } else if (switch_state(SW1) == 1 && switch_state(SW2) == 0) {
 
         // turn on RED, YELLOW, GREEN
         led_on(RED);
@@ -59,8 +55,9 @@ int main() {
         led_off(RED);
         led_off(YELLOW);
         led_off(GREEN);
+        SysTick_Delay1s_16MHz();
 
-      } else if (SW1_PRESSED == 0 && SW2_PRESSED == 0) {
+      } else if (switch_state(SW1) == 0 && switch_state(SW2) == 0) {
         // flash on RYG
         led_on(RED);
         led_on(YELLOW);
@@ -72,8 +69,9 @@ int main() {
         led_off(RED);
         led_off(YELLOW);
         led_off(GREEN);
+
+        SysTick_Delay1s_16MHz();
       }
-      */
     }
   }
 
