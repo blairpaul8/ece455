@@ -25,19 +25,19 @@ int main() {
       // This should demonstrate the functionality for Part 2A
       // call appropriate delay
       // GPIO_PORTA_DATA_R &=  	// Turn off when not testing
-      led_on(RED);
-      SysTick_Delay1s_16MHz();
-      led_off(RED);
 
       if(SW1_PRESSED == 1 && SW2_PRESSED == 1){
 
         led_on(GREEN);
         SysTick_Delay1s_16MHz();
         led_off(GREEN);
+
       } else if (SW1_PRESSED == 0 && SW2_PRESSED == 1){
+
         led_on(RED);
         SysTick_Delay1s_16MHz();
         led_off(RED);
+
       } else if (SW1_PRESSED == 1 && SW2_PRESSED == 0){
 
         // turn on RED, YELLOW, GREEN
