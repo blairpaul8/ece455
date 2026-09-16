@@ -8,7 +8,7 @@
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
-  2 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
+  1 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
     // overlapping), and 5 for Part 3B (With overlapping)
 
 int main() {
@@ -20,7 +20,7 @@ int main() {
   if (LAB_PART == 1) {
     // This should demonstrate the functionality for Part 2A
     SysTick_Init(); // Function to initialize the SysTick
-    
+
     while (1) {
       // This should demonstrate the functionality for Part 2A
       // call appropriate delay

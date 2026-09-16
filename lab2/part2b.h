@@ -8,9 +8,9 @@
 #define YELLOW 3
 #define GREEN 4
 
-//same with switches
-#define SW1 1 //PD1
-#define SW2 2 //PD2
+// same with switches
+#define SW1 1 // PD1
+#define SW2 2 // PD2
 #define SW1_PRESSED 0x01
 #define SW2_PRESSED 0x10
 

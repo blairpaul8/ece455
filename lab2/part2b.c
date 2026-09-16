@@ -4,8 +4,6 @@
 
 #include <stdint.h>
 
-// Fix pin numbers here
-
 void led_on(uint32_t pin) { GPIO_PORTD_DATA_R |= (1 << pin); }
 
 void led_off(uint32_t pin) { GPIO_PORTD_DATA_R &= ~(1 << pin); }

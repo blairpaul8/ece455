@@ -16,7 +16,7 @@ LDFLAGS = -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard \
 
 LIBS = -ldriver -lm -lc -lgcc
 
-OBJS = main.o startup_gcc.o PLL.o PortAD.o SysTick.o
+OBJS = main.o startup_gcc.o PLL.o PortAD.o SysTick.o part2b.o
 
 all: blink.bin
 
