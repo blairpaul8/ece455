@@ -1,4 +1,4 @@
-TIVAWARE = ../ti_sdk
+TIVAWARE = ../../ti_sdk
 PART     = TM4C123GH6PM
 
 CC      = arm-none-eabi-gcc
