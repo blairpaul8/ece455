@@ -8,7 +8,7 @@
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
-  2 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
+  5 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
     // overlapping), and 5 for Part 3B (With overlapping)
 
 int main() {
@@ -99,27 +99,14 @@ int main() {
   else if (LAB_PART == 5) {
     // This should demonstrate the functionality for Part 3B
     // Write the code below for "1011" Sequence detectror - with overalapping
-    uint8_t pattern = 0;
-    uint8_t input = 0;
-    if (switch_state(SW1)) {
-      input = 0;
-    } else if (switch_state(SW2)) {
-      input = 1;
-    }
+    PLL_Init();
+    SysTick_Init_Interrupts();
+    change_interrupt();
 
-    pattern <<= 1;
-    pattern |= input;
-
-    // & pattern with 0x0F to only check bottom 4 bits.
-    if ((pattern & 0x0F) == 11) {
-      led_off(RED);
-      led_on(GREEN);
-    } else {
-      led_off(GREEN);
-      led_on(RED);
+    while (1) {
+      // wait for interrupts
     }
   }
-
   // Shouldn't reach unless you set an incorrect value for LAB_PART
   else
     return 0;

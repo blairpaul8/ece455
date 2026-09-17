@@ -12,10 +12,15 @@
 #define YELLOW_TICKS 300
 #define GREEN_TICKS 400
 
+volatile uint32_t interrupt_mode = 0;
 volatile uint32_t g_handler_calls;
 volatile uint8_t count = 0;
 volatile uint8_t up = 0;
 volatile int8_t down = 7;
+uint8_t pattern = 0;
+int8_t prev_press;
+
+void change_interrupt() { interrupt_mode = 1; }
 
 // Initialize Systick
 void SysTick_Init(void) {
@@ -84,6 +89,7 @@ static void SysTick_Delay100us_25MHz(void) {
 // Write code to generate a 1 sec delay when the clock speed is 25MHz
 // Your code should call SysTick_Delay100us_25MHz()
 void SysTick_Delay1s_25MHz(void) {
+
   // 1,000,000 us in 1 second
   // Thus call delay 100us 10,000 times
   for (uint32_t i = 0; i < 10000; i++) {
@@ -93,60 +99,88 @@ void SysTick_Delay1s_25MHz(void) {
 
 // Interrupt handling routine should be written here
 void SysTick_Handler(void) {
-  g_handler_calls++;
+  if (interrupt_mode == 0) {
+    g_handler_calls++;
 
-  // if sw1 pressed count up
-  if (switch_state(SW1) == 0) {
-    // increment counter
-    count++;
+    // if sw1 pressed count up
+    if (switch_state(SW1) == 0) {
+      // increment counter
+      count++;
 
-    // using num times 10ms interrupt fires
-    // to get 1 second delay
-    if (count == 100) {
-      count = 0;
-      up++;
-      if (up > 7) {
-        up = 0;
+      // using num times 10ms interrupt fires
+      // to get 1 second delay
+      if (count == 100) {
+        count = 0;
+        up++;
+        if (up > 7) {
+          up = 0;
+          led_off(RED);
+          led_off(YELLOW);
+          led_off(GREEN);
+        }
+      }
+      // clear bits
+      GPIO_PORTA_DATA_R &= ~0x1C;
+      // shift up counter and turn on bits
+      GPIO_PORTA_DATA_R |= (up << 2) & 0x1C;
+
+      // count down
+    } else if (switch_state(SW2) == 0) {
+      // increment counter
+      count++;
+
+      // using num times 10ms interrupt fires
+      // to get 1 second delay
+      if (count == 100) {
+        count = 0;
+        down--;
+        if (down < 0) {
+          down = 7;
+          led_off(RED);
+          led_off(YELLOW);
+          led_off(GREEN);
+        }
+      }
+
+      // cleat bits
+      GPIO_PORTA_DATA_R &= ~0x1C;
+      // shift up counter and turn on bits
+      GPIO_PORTA_DATA_R |= (down << 2) & 0x1C;
+    } else {
+      uint32_t red = g_handler_calls % RED_TICKS;
+      uint32_t yellow = g_handler_calls % YELLOW_TICKS;
+      uint32_t green = g_handler_calls % GREEN_TICKS;
+
+      (red < 100) ? led_on(RED) : led_off(RED);
+      (yellow < 100) ? led_on(YELLOW) : led_off(YELLOW);
+      (green < 100) ? led_on(GREEN) : led_off(GREEN);
+    }
+  } else if (interrupt_mode == 1) {
+    uint8_t input = 0;
+    uint8_t pressed = 0;
+
+    if (switch_state(SW1) == 0) {
+      input = 0;
+      pressed = 1;
+    } else if (switch_state(SW2) == 0) {
+      input = 1;
+      pressed = 1;
+    }
+
+    if (pressed && !prev_press) {
+      pattern <<= 1;
+      pattern |= input;
+
+      // & pattern with 0x0F to only check bottom 4 bits.
+      if ((pattern & 0x0F) == 11) {
         led_off(RED);
-        led_off(YELLOW);
+        led_on(GREEN);
+      } else {
         led_off(GREEN);
+        led_on(RED);
       }
     }
 
-    // cleat bits
-    GPIO_PORTA_DATA_R &= ~0x1C;
-    // shift up counter and turn on bits
-    GPIO_PORTA_DATA_R |= (up << 2) & 0x1C;
-
-    // count down
-  } else if (switch_state(SW2) == 0) {
-    // increment counter
-    count++;
-
-    // using num times 10ms interrupt fires
-    // to get 1 second delay
-    if (count == 100) {
-      count = 0;
-      down--;
-      if (down < 0) {
-        down = 7;
-        led_off(RED);
-        led_off(YELLOW);
-        led_off(GREEN);
-      }
-    }
-
-    // cleat bits
-    GPIO_PORTA_DATA_R &= ~0x1C;
-    // shift up counter and turn on bits
-    GPIO_PORTA_DATA_R |= (down << 2) & 0x1C;
-  } else {
-    uint32_t red = g_handler_calls % RED_TICKS;
-    uint32_t yellow = g_handler_calls % YELLOW_TICKS;
-    uint32_t green = g_handler_calls % GREEN_TICKS;
-
-    (red < 100) ? led_on(RED) : led_off(RED);
-    (yellow < 100) ? led_on(YELLOW) : led_off(YELLOW);
-    (green < 100) ? led_on(GREEN) : led_off(GREEN);
+    prev_press = pressed;
   }
 }

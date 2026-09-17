@@ -7,4 +7,6 @@ void SysTick_Delay1s_16MHz(void);
 void SysTick_Delay1s_25MHz(void);
 void part_two_b_work(void);
 
+void change_interrupt();
+
 #endif
