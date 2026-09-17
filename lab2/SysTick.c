@@ -13,6 +13,8 @@
 #define GREEN_TICKS 400
 
 volatile uint32_t interrupt_mode = 0;
+volatile uint8_t overlap_mode = 0;
+
 volatile uint32_t g_handler_calls;
 volatile uint8_t count = 0;
 volatile uint8_t up = 0;
@@ -20,7 +22,10 @@ volatile int8_t down = 7;
 uint8_t pattern = 0;
 int8_t prev_press;
 
-void change_interrupt() { interrupt_mode = 1; }
+void change_interrupt(uint8_t overlap) {
+  interrupt_mode = 1;
+  overlap_mode = overlap;
+}
 
 // Initialize Systick
 void SysTick_Init(void) {
@@ -175,6 +180,9 @@ void SysTick_Handler(void) {
       if ((pattern & 0x0F) == 11) {
         led_off(RED);
         led_on(GREEN);
+        if (overlap_mode == 0) {
+          pattern = 0;
+        }
       } else {
         led_off(GREEN);
         led_on(RED);
