@@ -83,7 +83,6 @@ int main() {
     while (1) {
       // Do nothing except wait for a SysTick Interrupt and action taken care at
       // interrupt handler routine
-      //
     }
   }
 

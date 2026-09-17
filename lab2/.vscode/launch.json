@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Blink (OpenOCD)",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/blink.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "configFiles": [
+        "board/ti_ek-tm4c123gxl.cfg"
+      ],
+      "gdbPath": "arm-none-eabi-gdb",
+      "device": "TM4C123GH6PM",
+      "runToEntryPoint": "main",
+      "overrideLaunchCommands": [
+        "monitor halt",
+        "-target-download",
+        "monitor reset init"
+      ]
+    }
+  ]
+}

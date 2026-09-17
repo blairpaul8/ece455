@@ -13,6 +13,9 @@
 #define GREEN_TICKS 400
 
 volatile uint32_t g_handler_calls;
+volatile uint8_t count = 0;
+volatile uint8_t up = 0;
+volatile int8_t down = 7;
 
 // Initialize Systick
 void SysTick_Init(void) {
@@ -89,77 +92,61 @@ void SysTick_Delay1s_25MHz(void) {
 }
 
 // Interrupt handling routine should be written here
-volatile uint8_t count = 0;
-volatile uint8_t up = 0;
 void SysTick_Handler(void) {
   g_handler_calls++;
 
+  // if sw1 pressed count up
   if (switch_state(SW1) == 0) {
+    // increment counter
     count++;
-    if (up > 7) {
-      up = 0;
-    }
+
+    // using num times 10ms interrupt fires
+    // to get 1 second delay
     if (count == 100) {
       count = 0;
       up++;
+      if (up > 7) {
+        up = 0;
+        led_off(RED);
+        led_off(YELLOW);
+        led_off(GREEN);
+      }
     }
 
+    // cleat bits
+    GPIO_PORTA_DATA_R &= ~0x1C;
+    // shift up counter and turn on bits
     GPIO_PORTA_DATA_R |= (up << 2) & 0x1C;
-    /*
-     switch (up) {
-     case 0:
-       led_off(RED);
-       break;
-     case 1:
-       led_on(RED);
-       break;
-     case 2:
-       led_on(YELLOW);
-       led_off(RED);
-       break;
-     case 3:
-       led_on(YELLOW);
-       led_on(RED);
-       break;
-     case 4:
-       led_off(YELLOW);
-       led_off(RED);
-       led_on(GREEN);
-       break;
-     case 5:
-       // 101
-       led_on(RED);
-       led_off(YELLOW);
-       led_on(GREEN);
-       break;
-     case 6:
-       // 110
-       led_off(RED);
-       led_on(YELLOW);
-       led_on(GREEN);
-       break;
-     case 7:
-       led_on(YELLOW);
-       led_on(RED);
-       led_on(GREEN);
-       break;
-     default:
-       led_off(RED);
-       led_off(YELLOW);
-       led_off(GREEN);
 
-       break;
-     }
- */
-  } else if (switch_state(SW2) == 0) {
     // count down
+  } else if (switch_state(SW2) == 0) {
+    // increment counter
+    count++;
+
+    // using num times 10ms interrupt fires
+    // to get 1 second delay
+    if (count == 100) {
+      count = 0;
+      down--;
+      if (down < 0) {
+        down = 7;
+        led_off(RED);
+        led_off(YELLOW);
+        led_off(GREEN);
+      }
+    }
+
+    // cleat bits
+    GPIO_PORTA_DATA_R &= ~0x1C;
+    // shift up counter and turn on bits
+    GPIO_PORTA_DATA_R |= (down << 2) & 0x1C;
   } else {
     uint32_t red = g_handler_calls % RED_TICKS;
     uint32_t yellow = g_handler_calls % YELLOW_TICKS;
     uint32_t green = g_handler_calls % GREEN_TICKS;
 
     (red < 100) ? led_on(RED) : led_off(RED);
-    //(yellow < 100) ? led_on(YELLOW) : led_off(YELLOW);
-    //(green < 100) ? led_on(GREEN) : led_off(GREEN);
+    (yellow < 100) ? led_on(YELLOW) : led_off(YELLOW);
+    (green < 100) ? led_on(GREEN) : led_off(GREEN);
   }
 }
