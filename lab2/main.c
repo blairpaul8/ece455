@@ -4,7 +4,7 @@
 #include "part2b.h"
 #include "stdint.h"
 #include <stdint.h>
-// #include "tm4c123gh6pm.h"
+#include "tm4c123gh6pm.h"
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
@@ -88,6 +88,49 @@ int main() {
 
   else if (LAB_PART == 3) {
     // Write the code that demonstrate the functionality for Part 3A
+    SysTick_Init();
+
+    struct State{
+      uint32_t Out;
+      uint32_t Time;
+      const struct State *Next[4];
+    };
+
+    typedef const struct State STyp;
+
+    #define goN &FSM[0]
+    #define waitN &FSM[1]
+    #define goE &FSM[2]
+    #define waitE &FSM[3]
+
+    STyp FSM[4] = {
+      {0x01, 300, {goN, waitN, goN, waitN}},
+      {0x02, 100, {goE, goE, goE, goE}},
+      {0x04, 300, {goE, goE, waitE,waitE}},
+      {0x04, 100, {goN, goN, goN, goN}},
+    };
+
+    STyp *Pt;
+    Pt = goN;
+
+    while(1){
+      uint32_t Light;
+      Light = Pt->Out;
+      SysTick_Delay1s_25MHz();
+      
+
+      GPIO_PORTA_DATA_R &= ~0x07;
+      GPIO_PORTA_DATA_R |= Light;
+
+      int Input;
+      // uses switches as binary input
+      if (switch_state(SW1) == 1 && switch_state(SW2) == 1) Input = 0;
+      if (switch_state(SW1) == 1 && switch_state(SW2) == 0) Input = 1;
+      if (switch_state(SW1) == 0 && switch_state(SW2) == 1) Input = 2;
+      if (switch_state(SW1) == 0 && switch_state(SW2) == 0) Input = 3;
+      Pt = Pt->Next[Input];
+
+    }
   }
 
   else if (LAB_PART == 4) {
