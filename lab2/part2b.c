@@ -30,7 +30,6 @@ void count_up() {
   led_off(GREEN);
 
   SysTick_Delay1s_25MHz();
-
   // red on 001   1
   led_on(RED);
   SysTick_Delay1s_25MHz();
@@ -69,27 +68,3 @@ void count_down() {
   int i = 0;
   i++;
 }
-
-/*
-void toggle_leds() {
-  // make sure all leds are off.
-  led_off(RED);
-  led_off(YELLOW);
-  led_off(GREEN);
-
-  // red on
-  led_on(RED);
-  SysTick_Delay1s_25MHz();
-
-  // yellow on
-  led_off(RED);
-  led_on(YELLOW);
-  SysTick_Delay1s_25MHz();
-
-  // toggle green on
-  led_off(YELLOW);
-  led_on(GREEN);
-  SysTick_Delay1s_25MHz();
-}
-
-*/

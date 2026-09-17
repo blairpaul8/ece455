@@ -12,8 +12,10 @@
 #define YELLOW_TICKS 300
 #define GREEN_TICKS 400
 
-// Used in part 2B
 volatile uint32_t g_handler_calls;
+volatile uint8_t count = 0;
+volatile uint8_t up = 0;
+volatile int8_t down = 7;
 
 // Initialize Systick
 void SysTick_Init(void) {
@@ -47,9 +49,10 @@ void SysTick_Wait(uint32_t delay) {}
 // Clock speed is 16 MHz
 static void SysTick_Delay100us_16MHz(void) {
   // Use the Systick Timer to generate a 1ms delay
+  NVIC_ST_CTRL_R = 0;
 
   // Choose the number of clock ticks to wait
-  NVIC_ST_RELOAD_R = (CLOCK_16MHZ * 0.0001) -1;
+  NVIC_ST_RELOAD_R = (CLOCK_16MHZ * 0.0001) - 1;
 
   NVIC_ST_CURRENT_R = 0; // Any value written to write clears it
   while ((NVIC_ST_CTRL_R & 0x00010000) == 0) {
@@ -59,7 +62,7 @@ static void SysTick_Delay100us_16MHz(void) {
 // Write code to generate a 1 sec delay
 // Your code should call SysTick_Delay1ms()
 void SysTick_Delay1s_16MHz(void) {
-  for(int i = 0; i < 10000; i++){
+  for (int i = 0; i < 10000; i++) {
     SysTick_Delay100us_16MHz();
   }
 }
@@ -68,6 +71,8 @@ void SysTick_Delay1s_16MHz(void) {
 static void SysTick_Delay100us_25MHz(void) {
   // clock at 25MHz has 25,000,000 cycles per second
   // to get a 100us delay multiply by .0001
+  NVIC_ST_CTRL_R = 0;
+
   NVIC_ST_RELOAD_R = (CLOCK_25MHZ * .0001) - 1;
 
   NVIC_ST_CURRENT_R = 0;
@@ -89,10 +94,52 @@ void SysTick_Delay1s_25MHz(void) {
 // Interrupt handling routine should be written here
 void SysTick_Handler(void) {
   g_handler_calls++;
+
+  // if sw1 pressed count up
   if (switch_state(SW1) == 0) {
-    count_up();
-  } else if (switch_state(SW2) == 0) {
+    // increment counter
+    count++;
+
+    // using num times 10ms interrupt fires
+    // to get 1 second delay
+    if (count == 100) {
+      count = 0;
+      up++;
+      if (up > 7) {
+        up = 0;
+        led_off(RED);
+        led_off(YELLOW);
+        led_off(GREEN);
+      }
+    }
+
+    // cleat bits
+    GPIO_PORTA_DATA_R &= ~0x1C;
+    // shift up counter and turn on bits
+    GPIO_PORTA_DATA_R |= (up << 2) & 0x1C;
+
     // count down
+  } else if (switch_state(SW2) == 0) {
+    // increment counter
+    count++;
+
+    // using num times 10ms interrupt fires
+    // to get 1 second delay
+    if (count == 100) {
+      count = 0;
+      down--;
+      if (down < 0) {
+        down = 7;
+        led_off(RED);
+        led_off(YELLOW);
+        led_off(GREEN);
+      }
+    }
+
+    // cleat bits
+    GPIO_PORTA_DATA_R &= ~0x1C;
+    // shift up counter and turn on bits
+    GPIO_PORTA_DATA_R |= (down << 2) & 0x1C;
   } else {
     uint32_t red = g_handler_calls % RED_TICKS;
     uint32_t yellow = g_handler_calls % YELLOW_TICKS;
@@ -101,7 +148,5 @@ void SysTick_Handler(void) {
     (red < 100) ? led_on(RED) : led_off(RED);
     (yellow < 100) ? led_on(YELLOW) : led_off(YELLOW);
     (green < 100) ? led_on(GREEN) : led_off(GREEN);
-    
   }
-
 }
