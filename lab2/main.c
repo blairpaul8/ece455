@@ -88,6 +88,7 @@ int main() {
 
   else if (LAB_PART == 3) {
     // Write the code that demonstrate the functionality for Part 3A
+    PLL_Init();
     SysTick_Init();
 
     struct State{
@@ -104,8 +105,8 @@ int main() {
     #define waitE &FSM[3]
 
     STyp FSM[4] = {
-      {0x01, 300, {goN, waitN, goN, waitN}},
-      {0x02, 100, {goE, goE, goE, goE}},
+      {0x10, 300, {goN, waitN, goN, waitN}},
+      {0x08, 100, {goE, goE, goE, goE}},
       {0x04, 300, {goE, goE, waitE,waitE}},
       {0x04, 100, {goN, goN, goN, goN}},
     };
@@ -116,11 +117,13 @@ int main() {
     while(1){
       uint32_t Light;
       Light = Pt->Out;
-      SysTick_Delay1s_25MHz();
-      
 
-      GPIO_PORTA_DATA_R &= ~0x07;
+      GPIO_PORTA_DATA_R &= ~0x1C;
       GPIO_PORTA_DATA_R |= Light;
+
+      for (uint32_t t = 0; t < Pt->Time / 100; t++) {
+        SysTick_Delay1s_25MHz();
+      }
 
       int Input;
       // uses switches as binary input
