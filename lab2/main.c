@@ -24,14 +24,6 @@ typedef const struct State STyp;
 #define goE &FSM[2]
 #define waitE &FSM[3]
 
-STyp FSM[4] = {
-    {0x10, 3, {goN, waitN, goN, waitN}},
-    {0x08, 1, {goE, goE, goE, goE}},
-    {0x04, 3, {goE, goE, waitE, waitE}},
-    {0x04, 1, {goN, goN, goN, goN}},
-
-};
-
 int main() {
 
   // call the port initialization function
@@ -111,6 +103,14 @@ int main() {
     // Write the code that demonstrate the functionality for Part 3A
     PLL_Init();
     SysTick_Init();
+
+    STyp FSM[4] = {
+        {0x10, 3, {goN, waitN, goN, waitN}},
+        {0x08, 1, {goE, goE, goE, goE}},
+        {0x04, 3, {goE, goE, waitE, waitE}},
+        {0x04, 1, {goN, goN, goN, goN}},
+
+    };
 
     STyp *Pt = goN;
 
