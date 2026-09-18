@@ -8,7 +8,7 @@
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
-  1 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
+  3 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
     // overlapping), and 5 for Part 3B (With overlapping)
 
 int main() {
@@ -104,9 +104,9 @@ int main() {
 #define R &FSM[2]
 
     STyp FSM[3] = {
-        {0x10, 300, {G, Y, G, Y}},
-        {0x08, 100, {R, R, R, R}},
-        {0x04, 300, {R, R, G, G}},
+        {0x10, 3, {G, Y, G, Y}},
+        {0x08, 1, {R, R, R, R}},
+        {0x04, 3, {R, R, G, G}},
     };
 
     STyp *Pt = G;
@@ -118,7 +118,7 @@ int main() {
       GPIO_PORTA_DATA_R &= ~0x1C;
       GPIO_PORTA_DATA_R |= Light;
 
-      for (uint32_t t = 0; t < Pt->Time / 100; t++) {
+      for (uint32_t t = 0; t < Pt->Time; t++) {
         SysTick_Delay1s_25MHz();
       }
 
