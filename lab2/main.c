@@ -91,7 +91,7 @@ int main() {
     PLL_Init();
     SysTick_Init();
 
-    struct State{
+    struct State {
       uint32_t Out;
       uint32_t Time;
       const struct State *Next[4];
@@ -99,21 +99,17 @@ int main() {
 
     typedef const struct State STyp;
 
-    #define goN &FSM[0]
-    #define waitN &FSM[1]
-    #define goE &FSM[2]
-    #define waitE &FSM[3]
+    #define G &FSM[0]
+    #define Y &FSM[1]
+    #define R &FSM[2]
 
-    STyp FSM[4] = {
-      {0x10, 300, {goN, waitN, goN, waitN}},
-      {0x08, 100, {goE, goE, goE, goE}},
-      {0x04, 300, {goE, goE, waitE,waitE}},
-      {0x04, 100, {goN, goN, goN, goN}},
+    STyp FSM[3] = {
+      {0x10, 300, {G, Y, G, Y}},
+      {0x08, 100, {R, R, R, R}},
+      {0x04, 300, {R, R, G, G}},
     };
 
-    STyp *Pt;
-    Pt = goN;
-
+    STyp *Pt = G;
     while(1){
       uint32_t Light;
       Light = Pt->Out;
