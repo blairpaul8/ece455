@@ -8,8 +8,29 @@
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
-  5 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
+  3 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
     // overlapping), and 5 for Part 3B (With overlapping)
+
+struct State {
+  uint32_t Out;
+  uint32_t Time;
+  const struct State *Next[4];
+};
+
+typedef const struct State STyp;
+
+#define goN &FSM[0]
+#define waitN &FSM[1]
+#define goE &FSM[2]
+#define waitE &FSM[3]
+
+STyp FSM[4] = {
+    {0x10, 3, {goN, waitN, goN, waitN}},
+    {0x08, 1, {goE, goE, goE, goE}},
+    {0x04, 3, {goE, goE, waitE, waitE}},
+    {0x04, 1, {goN, goN, goN, goN}},
+
+};
 
 int main() {
 
@@ -90,27 +111,6 @@ int main() {
     // Write the code that demonstrate the functionality for Part 3A
     PLL_Init();
     SysTick_Init();
-
-    struct State {
-      uint32_t Out;
-      uint32_t Time;
-      const struct State *Next[4];
-    };
-
-    typedef const struct State STyp;
-
-#define goN &FSM[0]
-#define waitN &FSM[1]
-#define goE &FSM[2]
-#define waitE &FSM[3]
-
-    STyp FSM[4] = {
-        {0x10, 3, {goN, waitN, goN, waitN}},
-        {0x08, 1, {goE, goE, goE, goE}},
-        {0x04, 3, {goE, goE, waitE, waitE}},
-        {0x04, 1, {goN, goN, goN, goN}},
-        
-    };
 
     STyp *Pt = goN;
 
