@@ -39,7 +39,7 @@ void PortD_Init(void) {
   // Initialize PD1 and PD2 as inputs for the switches
   GPIO_PORTD_DIR_R &= ~0x06;
 
-  // Set PF0 and PF4 to Pull Up Resistors
+  // Set PD1 and PD2 to Pull Up Resistors
   GPIO_PORTD_PUR_R |= 0x06;
 }
 

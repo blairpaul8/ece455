@@ -54,19 +54,18 @@ void SysTick_Init_Interrupts(void) {
   NVIC_ST_CTRL_R = 0x00000007;
 }
 
-void SysTick_Wait(uint32_t delay) {}
+void SysTick_Wait(uint32_t delay) {
+  NVIC_ST_RELOAD_R = delay - 1;
+
+  NVIC_ST_CURRENT_R = 0;
+
+  while ((NVIC_ST_CTRL_R & 0x00010000) == 0) {
+  } // Wait for count flag
+}
 
 // Clock speed is 16 MHz
 static void SysTick_Delay100us_16MHz(void) {
-  // Use the Systick Timer to generate a 1ms delay
-  NVIC_ST_CTRL_R = 0;
-
-  // Choose the number of clock ticks to wait
-  NVIC_ST_RELOAD_R = (CLOCK_16MHZ * 0.0001) - 1;
-
-  NVIC_ST_CURRENT_R = 0; // Any value written to write clears it
-  while ((NVIC_ST_CTRL_R & 0x00010000) == 0) {
-  } // Wait for count flag
+  SysTick_Wait(CLOCK_16MHZ / 10000);
 }
 
 // Write code to generate a 1 sec delay
@@ -79,16 +78,7 @@ void SysTick_Delay1s_16MHz(void) {
 
 // Write code to generate 1ms delay assuming a clock speed of 25MHz
 static void SysTick_Delay100us_25MHz(void) {
-  // clock at 25MHz has 25,000,000 cycles per second
-  // to get a 100us delay multiply by .0001
-  NVIC_ST_CTRL_R = 0;
-
-  NVIC_ST_RELOAD_R = (CLOCK_25MHZ * .0001) - 1;
-
-  NVIC_ST_CURRENT_R = 0;
-
-  while ((NVIC_ST_CTRL_R & 0x00010000) == 0) {
-  }
+  SysTick_Wait(CLOCK_25MHZ / 10000);
 }
 
 // Write code to generate a 1 sec delay when the clock speed is 25MHz

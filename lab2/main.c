@@ -8,7 +8,7 @@
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
-  4 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
+  1 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
     // overlapping), and 5 for Part 3B (With overlapping)
 
 int main() {
@@ -99,18 +99,19 @@ int main() {
 
     typedef const struct State STyp;
 
-    #define G &FSM[0]
-    #define Y &FSM[1]
-    #define R &FSM[2]
+#define G &FSM[0]
+#define Y &FSM[1]
+#define R &FSM[2]
 
     STyp FSM[3] = {
-      {0x10, 300, {G, Y, G, Y}},
-      {0x08, 100, {R, R, R, R}},
-      {0x04, 300, {R, R, G, G}},
+        {0x10, 300, {G, Y, G, Y}},
+        {0x08, 100, {R, R, R, R}},
+        {0x04, 300, {R, R, G, G}},
     };
 
     STyp *Pt = G;
-    while(1){
+
+    while (1) {
       uint32_t Light;
       Light = Pt->Out;
 
@@ -123,12 +124,15 @@ int main() {
 
       int Input;
       // uses switches as binary input
-      if (switch_state(SW1) == 1 && switch_state(SW2) == 1) Input = 0;
-      if (switch_state(SW1) == 1 && switch_state(SW2) == 0) Input = 1;
-      if (switch_state(SW1) == 0 && switch_state(SW2) == 1) Input = 2;
-      if (switch_state(SW1) == 0 && switch_state(SW2) == 0) Input = 3;
+      if (switch_state(SW1) == 1 && switch_state(SW2) == 1)
+        Input = 0;
+      if (switch_state(SW1) == 1 && switch_state(SW2) == 0)
+        Input = 1;
+      if (switch_state(SW1) == 0 && switch_state(SW2) == 1)
+        Input = 2;
+      if (switch_state(SW1) == 0 && switch_state(SW2) == 0)
+        Input = 3;
       Pt = Pt->Next[Input];
-
     }
   }
 
