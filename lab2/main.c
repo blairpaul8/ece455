@@ -8,7 +8,7 @@
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART                                                               \
-  3 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
+  5 // 1 for Part2A, 2 for Part 2B, 3 for Part 3A, 4 for Part 3B (Without
     // overlapping), and 5 for Part 3B (With overlapping)
 
 int main() {
@@ -99,17 +99,20 @@ int main() {
 
     typedef const struct State STyp;
 
-#define G &FSM[0]
-#define Y &FSM[1]
-#define R &FSM[2]
+#define goN &FSM[0]
+#define waitN &FSM[1]
+#define goE &FSM[2]
+#define waitE &FSM[3]
 
-    STyp FSM[3] = {
-        {0x10, 3, {G, Y, G, Y}},
-        {0x08, 1, {R, R, R, R}},
-        {0x04, 3, {R, R, G, G}},
+    STyp FSM[4] = {
+        {0x10, 3, {goN, waitN, goN, waitN}},
+        {0x08, 1, {goE, goE, goE, goE}},
+        {0x04, 3, {goE, goE, waitE, waitE}},
+        {0x04, 1, {goN, goN, goN, goN}},
+        
     };
 
-    STyp *Pt = G;
+    STyp *Pt = goN;
 
     while (1) {
       uint32_t Light;
