@@ -8,7 +8,7 @@
 // Part 1B: complete UART_GetChar, UART_inUDec and UART_OutUDec.
 // The instructor-defined functions at the end of this file must not be changed.
 /*Some Example Modules are taken from Book: "
-	"Embedded Systems: Introduction to ARM Cortex M Microcontrollers",
+        "Embedded Systems: Introduction to ARM Cortex M Microcontrollers",
    ISBN: 978-1469998749, Jonathan Valvano, copyright (c) 2014
 */
 // this connection occurs in the USB debugging cable
@@ -16,51 +16,51 @@
 // U0Tx (PA1) connected to serial port on PC
 // Ground connected ground in the USB cable
 
-
 #include <stdint.h>
 #include "UART.h"
 #include "tm4c123gh6pm.h"
 
-
-#define UART_FR_TXFF            0x00000020  // UART Transmit FIFO Full
-#define UART_FR_RXFE            0x00000010  // UART Receive FIFO Empty
-#define UART_LCRH_WLEN_8        0x00000060  // 8 bit word length
-#define UART_LCRH_FEN           0x00000010  // UART Enable FIFOs
-#define UART_CTL_UARTEN         0x00000001  // UART Enable
-
+#define UART_FR_TXFF 0x00000020     // UART Transmit FIFO Full
+#define UART_FR_RXFE 0x00000010     // UART Receive FIFO Empty
+#define UART_LCRH_WLEN_8 0x00000060 // 8 bit word length
+#define UART_LCRH_FEN 0x00000010    // UART Enable FIFOs
+#define UART_CTL_UARTEN 0x00000001  // UART Enable
 
 //------------UART_Init------------
-// Initialize the UART for 9600 baud rate (50 MHz UART clock, after enabling the PLL),
-// 8 bit word length, no parity bits, one stop bit, FIFOs enabled
-// Input: none
-// Output: none
-void UART_Init(void){
-	// You should check all the values in below code and decide as per configuaration given
-	
-  SYSCTL_RCGCUART_R |= 0x00;            							// activate UART0
-  SYSCTL_RCGCGPIO_R |= 0x00;            							// activate port A
-	
-	
-  while((SYSCTL_PRGPIO_R&0x01) == 0){};
-  UART0_CTL_R &= ~UART_CTL_UARTEN;      							// disable UART
-		
-	// IBRD and FBRD is very critical, follwoing is set for 115200 baud and PLL set at 80M, you should modify for your configuration
-  UART0_IBRD_R = 43;                    							// IBRD = int(80,000,000 / (16 * 115,200)) = int(43.4028)=43
-  UART0_FBRD_R = 25;                     							// FBRD = int(0.4028 * 64+0.5) = 26
-  
-	// 8 bit word length (no parity bits, one stop bit, FIFOs)
-  UART0_LCRH_R = (UART_LCRH_WLEN_8|UART_LCRH_FEN);
-		
-	// The following values are delibrately changed, you should find as per the instruction in comment
-  UART0_CTL_R |= 0x01;                 							// enable UART
-  GPIO_PORTA_AFSEL_R |=0x01 ;           						// enable alt funct on PA1-0
-  GPIO_PORTA_DEN_R |= 0x01 ;             						// enable digital I/O on PA1-0
-  
-	// configure PA1-0 as UART, check 0x00000023 this value
-  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFFFFFF00)+0x00000023;
-	
-			
-  GPIO_PORTA_AMSEL_R &= 0x01;          // disable analog functionality on PA
+// Initialize the UART for 9600 baud rate (50 MHz UART clock, after enabling the
+// PLL), 8 bit word length, no parity bits, one stop bit, FIFOs enabled Input:
+// none Output: none
+void UART_Init(void) {
+  // You should check all the values in below code and decide as per
+  // configuaration given
+
+  SYSCTL_RCGCUART_R |= 0x01; // activate UART0
+  SYSCTL_RCGCGPIO_R |= 0x01; // activate port A
+
+  while ((SYSCTL_PRGPIO_R & 0x01) == 0) {
+  };
+
+  UART0_CTL_R &= ~UART_CTL_UARTEN; // disable UART
+
+  // IBRD and FBRD is very critical, follwoing is set for 115200 baud and PLL
+  // set at 80M, you should modify for your configuration
+  UART0_IBRD_R =
+      325;           // IBRD = int(50,000,000 / (16 * 9600)) = int(325.5208)=325
+  UART0_FBRD_R = 33; // FBRD = int(0.5208 * 64 + 0.5) = 33
+
+  // 8 bit word length (no parity bits, one stop bit, FIFOs)
+  UART0_LCRH_R = (UART_LCRH_WLEN_8 | UART_LCRH_FEN);
+
+  // The following values are delibrately changed, you should find as per the
+  // instruction in comment
+  UART0_CTL_R |= 0x01;        // enable UART
+  GPIO_PORTA_AFSEL_R |= 0x03; // enable alt funct on PA1-0
+  GPIO_PORTA_DEN_R |= 0x03;   // enable digital I/O on PA1-0
+
+  // configure PA1-0 as UART, check 0x00000023 this value
+  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R & 0xFFFFFF00) + 0x00000011;
+
+  GPIO_PORTA_AMSEL_R &= ~0x03; // disable analog functionality on PA
 }
 
 //------------Getchar-----------
@@ -69,18 +69,17 @@ void UART_Init(void){
 // Output: ASCII code for key typed
 // Should block until the user presses a key and then returns that value
 // Returns a newline until it has been correctly implemented
-char UART_GetChar(void){
+char UART_GetChar(void) {
   char retchar = '\n';
-	
-	// Add your code for following functions
-	  // Wait until the Receive FIFO empty flag (RXFE) is 0
-		// This means data has been received and is available
-	
-	// Put the result from data register to retchar
-	
-	// Return
-	return retchar;
-	
+
+  // Add your code for following functions
+  // Wait until the Receive FIFO empty flag (RXFE) is 0
+  // This means data has been received and is available
+
+  // Put the result from data register to retchar
+
+  // Return
+  return retchar;
 }
 //------------UART_InUDec------------
 // InUDec accepts ASCII input in unsigned decimal format
@@ -90,29 +89,29 @@ char UART_GetChar(void){
 // Output: 32-bit unsigned number
 // If you enter a number above 4294967295, it will return an incorrect value
 // Backspace will remove last digit typed
-uint32_t UART_inUDec(void){
-	uint32_t number=0, length=0;
-	char character;
+uint32_t UART_inUDec(void) {
+  uint32_t number = 0, length = 0;
+  char character;
   character = UART_InChar();
-  
-	while(){ // accepts until <enter - i.e. CR> is typed
-		
-		// The next line checks that the input is a digit, 0-9.
-		// If the character is not 0-9, it is ignored and not echoed
-    if((character>='0') && (character<='9')) {
-      number =    										// this line overflows if above 4294967295
-      length++;
-      UART_OutChar(character);       // Instructor defined function, no change
+
+  while (1) { // accepts until <enter - i.e. CR> is typed
+
+    // The next line checks that the input is a digit, 0-9.
+    // If the character is not 0-9, it is ignored and not echoed
+    if ((character >= '0') && (character <= '9')) {
+      number = // this line overflows if above 4294967295
+          length++;
+      UART_OutChar(character); // Instructor defined function, no change
     }
-		// Else If the input is a backspace, then the return number is
-		// changed and a backspace is outputted to the screen
-    else if((character==BS) && length){
-      number /= ;												// write your logic here
-      length--;
-      UART_OutChar(character);					// Instructor defined function, no change
+    // Else If the input is a backspace, then the return number is
+    // changed and a backspace is outputted to the screen
+    else if ((character == BS) && length) {
+      // number /= ;
+      // // write your logic here length--;
+      UART_OutChar(character); // Instructor defined function, no change
     }
-		
-		// Default accept
+
+    // Default accept
     character = UART_InChar();
   }
   return number;
@@ -123,12 +122,11 @@ uint32_t UART_inUDec(void){
 // Input: 32-bit number to be transferred
 // Output: none
 // Variable format 1-10 digits with no space before or after
-void UART_OutUDec(uint32_t n){
-// This function uses recursion to convert decimal number
-//   of unspecified length as an ASCII string
+void UART_OutUDec(uint32_t n) {
+  // This function uses recursion to convert decimal number
+  //   of unspecified length as an ASCII string
 
-
-/* convert n to ASCII and sent */
+  /* convert n to ASCII and sent */
 }
 
 // you can add more functions below
@@ -141,38 +139,35 @@ void UART_OutUDec(uint32_t n){
 /*-----------------------------------------------------------------*/
 // You should look following function, it may help to write up your code
 
-
 //------------UART_OutChar------------
 // Output 8-bit to serial port
 // Input: letter is an 8-bit ASCII character to be transferred
 // Output: none
-void UART_OutChar(char data){
-  while((UART0_FR_R&UART_FR_TXFF) != 0);
+void UART_OutChar(char data) {
+  while ((UART0_FR_R & UART_FR_TXFF) != 0)
+    ;
   UART0_DR_R = data;
 }
-
 
 //------------UART_OutString------------
 // Output String (NULL termination)
 // Input: pointer to a NULL-terminated string to be transferred
 // Output: none
-void UART_printf(char *pt){
-  while(*pt){
+void UART_printf(char *pt) {
+  while (*pt) {
     UART_OutChar(*pt);
     pt++;
   }
 }
 
-
 //---------------------Newline---------------------
 // Output a CR,LF to UART to go to a new line
 // Input: none
 // Output: none
-void Newline(void){
+void Newline(void) {
   UART_OutChar(CR);
   UART_OutChar(LF);
 }
-
 
 //------------UART_InString------------
 // Accepts ASCII characters from the serial port
@@ -187,18 +182,17 @@ void Newline(void){
 // Output: Null terminated string
 
 void UART_InString(char *bufPt, uint16_t max) {
-int length=0;
-char character;
+  int length = 0;
+  char character;
   character = UART_InChar();
-  while(character != CR){
-    if(character == BS){
-      if(length){
+  while (character != CR) {
+    if (character == BS) {
+      if (length) {
         bufPt--;
         length--;
         UART_OutChar(BS);
       }
-    }
-    else if(length < max){
+    } else if (length < max) {
       *bufPt = character;
       bufPt++;
       length++;
