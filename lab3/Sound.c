@@ -34,13 +34,13 @@ const unsigned shortwave[32] = {
 // Input: none
 // Output: none
 void DAC_Init(void){unsigned long volatile delay;
-  // activate port B
-  // allow time to finish activating
-	// no analog 
-	// regular function
-  // make PB2-0 out
-  // disable alt funct on PB2-0
-  // enable digital I/O on PB2-0
+  SYSCTL_RCGCGPIO_R |= 0x02; // activate port B
+  while((SYSCTL_PRGPIO_R & 0x02) == 0){}; // allow time to finish activating
+	GPIO_PORTB_AMSEL_R &= ~0x07; // no analog 
+	GPIO_PORTB_PCTL_R &= ~0x00000FFF; // regular function
+  GPIO_PORTB_DIR_R |= 0x07; // make PB2-0 out
+  GPIO_PORTB_AFSEL_R &= ~0x07; // disable alt funct on PB2-0
+  GPIO_PORTB_DEN_R |= 0x07; // enable digital I/O on PB2-0
 }
 
 // **************Sound_Init*********************
@@ -55,11 +55,11 @@ void Sound_Init(unsigned long period){
   Index = 0;
 	// your code begins below
 	
-  // disable SysTick during setup
+  NVIC_ST_CTRL_R = 0; // disable SysTick during setup
   NVIC_ST_RELOAD_R = period-1;// reload value should be as per the value passed in period
-  // any write to current clears it
-  // priority 1      
-  // enable SysTick with core clock and interrupts
+  NVIC_ST_CURRENT_R = 0; // any write to current clears it
+  NVIC_SYS_PRI3_R = (NVIC_SYS_PRI3_R & ~NVIC_SYS_PRI3_TICK_M) | (1 << NVIC_SYS_PRI3_TICK_S); // priority 1      
+  NVIC_ST_CTRL_R = NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_CLK_SRC | NVIC_ST_CTRL_INTEN; // enable, core clock, interrupts
 }
 
 // **************DAC_Out*********************
@@ -67,7 +67,7 @@ void Sound_Init(unsigned long period){
 // Input: 3-bit data, 0 to 7 
 // Output: none
 void DAC_Out(unsigned long data){
-  // write the value to Data register at PortB
+  GPIO_PORTB_DATA_R = (GPIO_PORTB_DATA_R & ~0x07) | (data & 0x07); // write the value to Data register at PortB
 }
 
 // Interrupt service routine
@@ -76,7 +76,8 @@ void SysTick_Handler(void){
  
 	// Increment the Index and make sure it should roll over to 0 after 0x0F, i.e. 15 in decimal,  
 	// corresponding to size of the variable SineWave[16]
-  
+  Index = (Index + 1) & 0x0F;
+
 	// calll DAC_out function and pass 
   DAC_Out(SineWave[Index]); 						// Comment this line for Part 3
 	

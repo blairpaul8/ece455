@@ -32,6 +32,14 @@ void Delay20ms(void){unsigned long volatile time;
 // Output: none 
 void Switch_Init(void){ volatile unsigned long  delay;
 	// Following function initializw PE0 and PE1 to be used as switch
+  SYSCTL_RCGCGPIO_R |= 0x10;              // activate port E (bit 4 = Port E)
+  delay = SYSCTL_RCGCGPIO_R;              // allow time to finish activating
+
+  GPIO_PORTE_AMSEL_R &= ~0x03;   // no analog on PE1-0
+  GPIO_PORTE_PCTL_R  &= ~0x000000FF; // regular GPIO function
+  GPIO_PORTE_DIR_R   &= ~0x03;   // PE1-0 input
+  GPIO_PORTE_AFSEL_R &= ~0x03;   // no alt function
+  GPIO_PORTE_DEN_R   |= 0x03;    // digital enable
 }
 
 //---------------------Switch_In---------------------
@@ -42,14 +50,19 @@ void Switch_Init(void){ volatile unsigned long  delay;
 // bit1 PE1 SW1 switch
 // bit0 PE0 SW2 switch 
 unsigned long Switch_In(void){ 
+  unsigned long first, second;
   // read the switch status
-	
+	first = GPIO_PORTE_DATA_R & 0x03;
+
 	// Delay 20 ms, call 10 ms twice (Think, why it is written differently from previous assignemnt. what could be the reason? 
-	
+	Delay20ms(); 
+
 	// read switch status again
-	
+  second = GPIO_PORTE_DATA_R & 0x03;	
+
 	// if both read shows same status (pressed) then only, take decision that switch is pressed
-	
+	if (first == second) return first;
+
 	return 0;               // remoce this
 }
 
