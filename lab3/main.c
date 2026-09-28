@@ -1,6 +1,6 @@
 // Lab 3: UART and DAC Interfacing
 // ECE 455 / ECE 555, Embedded Systems Design, Fall 2026
-// Team Members name: <Student1>; <Student2>
+// Team Members name: Paul Blair; Benjamin Drumwright
 // Due Date: Friday, October 2, 2026, 11:59 p.m.
 //
 // Background Setup: the bus clock must be 50 MHz. Open PLL.c and set SYSDIV2
@@ -37,8 +37,9 @@ int main() {
 
     // No need to change the following line- if done correctly then Putty Should
     // display the correct message
-    UART_printf("UART Initialization complete"); // Instructor given function to
-                                                 // print string
+    UART_printf("UART Initialization complete"); // Instructor given function
+    // to
+    // print string
     Newline(); // Instructor given function to go to new line
 
     while (1) {
