@@ -13,6 +13,7 @@
 #include "Sound.h"
 #include "Switch.h"
 #include "tm4c123gh6pm.h"
+#include <stdint.h>
 
 // Change this number to the current part of the lab you are working on
 #define LAB_PART 1 // 1 for Part1, 2 for Part 2, 3 for Part 3
@@ -20,6 +21,8 @@
 // basic functions defined at end of startup.s
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
+
+uint32_t convert_input(char a, uint32_t input);
 
 int main() {
 
@@ -55,27 +58,18 @@ int main() {
       Newline();
 
       char selection = UART_InChar();
-      char *prefix = "Selected: ";
-      char out[32];
-      uint8_t i;
-      for (i = 0; i < 9; i++) {
-        out[i] = prefix[i];
-      }
-      out[i + 1] = selection;
 
-      out[i + 2] = '\0';
-
-      UART_printf(out);
+      UART_OutChar(selection);
 
       Newline();
 
       UART_printf("Input a value to convert >> ");
 
-      char input_str[32];
-      UART_InString(input_str, 31);
+      uint32_t input = UART_inUDec();
       Newline();
 
-      UART_printf(input_str);
+      uint32_t output = convert_input(selection, input);
+      UART_OutUDec(output);
 
       Newline();
     }
@@ -141,4 +135,22 @@ int main() {
   // Shouldn't reach unless you set an incorrect value for LAB_PART
   else
     return 0;
+}
+
+uint32_t convert_input(char a, uint32_t input) {
+  uint32_t retval = 0xFF;
+  switch (a) {
+  case '0':
+    // convert millimeter to centimeter
+    retval = input * .10;
+    break;
+  case '1':
+    break;
+  case '2':
+    break;
+  default:
+    UART_printf("Invalid argument to convert_input.");
+    break;
+  }
+  return retval;
 }
