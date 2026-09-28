@@ -37,13 +37,47 @@ int main() {
 
     // No need to change the following line- if done correctly then Putty Should
     // display the correct message
+
     UART_printf("UART Initialization complete"); // Instructor given function
-    // to
-    // print string
+
     Newline(); // Instructor given function to go to new line
 
     while (1) {
       // The code for Part 1 is here
+      UART_printf("Select an option below.");
+      Newline();
+      UART_printf("0    Convert millimeter to centimeter");
+      Newline();
+      UART_printf("1    Convert centimeter to meter");
+      Newline();
+      UART_printf("2    Convert meter to centimeter");
+      Newline();
+      Newline();
+
+      char selection = UART_InChar();
+      char *prefix = "Selected: ";
+      char out[32];
+      uint8_t i;
+      for (i = 0; i < 9; i++) {
+        out[i] = prefix[i];
+      }
+      out[i + 1] = selection;
+
+      out[i + 2] = '\0';
+
+      UART_printf(out);
+
+      Newline();
+
+      UART_printf("Input a value to convert >> ");
+
+      char input_str[32];
+      UART_InString(input_str, 31);
+      Newline();
+
+      UART_printf(input_str);
+
+      Newline();
     }
   }
 
@@ -69,25 +103,26 @@ int main() {
       // The code for Part 2C comes here
       unsigned long sw = Switch_In();
 
-      if (sw == 0x00){ // no press, no sound 
+      if (sw == 0x00) { // no press, no sound
         //
         NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
 
-      } else if (sw == 0x01){ // SW1 only, 1 kHz
+      } else if (sw == 0x01) { // SW1 only, 1 kHz
 
-        NVIC_ST_RELOAD_R = 3125 - 1; // 3125 = 1KHZ period, 50,000,000 / (1000 * 16)
+        NVIC_ST_RELOAD_R =
+            3125 - 1; // 3125 = 1KHZ period, 50,000,000 / (1000 * 16)
         NVIC_ST_CURRENT_R = 0;
         NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
-      } else if (sw == 0x02){ // SW2 only, 2kHz 
+      } else if (sw == 0x02) { // SW2 only, 2kHz
 
-        NVIC_ST_RELOAD_R = 1563 - 1; // 1563 = 2kHz period, 50,000,000 / (2000 * 16)
+        NVIC_ST_RELOAD_R =
+            1563 - 1; // 1563 = 2kHz period, 50,000,000 / (2000 * 16)
         NVIC_ST_CURRENT_R = 0;
         NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
 
       } else { // both pressed, no sound
 
         NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
-
       }
     }
   }

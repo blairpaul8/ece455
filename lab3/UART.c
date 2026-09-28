@@ -61,26 +61,33 @@ void UART_Init(void) {
   GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R & 0xFFFFFF00) + 0x00000011;
 
   GPIO_PORTA_AMSEL_R &= ~0x03; // disable analog functionality on PA
+  for (volatile uint32_t i = 0; i < 1000; i++) {
+  }
 }
 
-//------------Getchar-----------
+//------------InChar-----------
 // Wait for new serial port input
 // Input: none
 // Output: ASCII code for key typed
 // Should block until the user presses a key and then returns that value
 // Returns a newline until it has been correctly implemented
-char UART_GetChar(void) {
+char UART_InChar(void) {
   char retchar = '\n';
 
   // Add your code for following functions
   // Wait until the Receive FIFO empty flag (RXFE) is 0
   // This means data has been received and is available
 
+  while ((UART0_FR_R & UART_FR_RXFE) != 0)
+    ;
+
   // Put the result from data register to retchar
+  retchar = UART0_DR_R;
 
   // Return
   return retchar;
 }
+
 //------------UART_InUDec------------
 // InUDec accepts ASCII input in unsigned decimal format
 //     and converts to a 32-bit unsigned number
@@ -99,20 +106,23 @@ uint32_t UART_inUDec(void) {
     // The next line checks that the input is a digit, 0-9.
     // If the character is not 0-9, it is ignored and not echoed
     if ((character >= '0') && (character <= '9')) {
-      number = // this line overflows if above 4294967295
-          length++;
+      number = (number * 10) + (character - '0');
+      length++;
       UART_OutChar(character); // Instructor defined function, no change
     }
     // Else If the input is a backspace, then the return number is
     // changed and a backspace is outputted to the screen
     else if ((character == BS) && length) {
-      // number /= ;
+      number /= 10;
       // // write your logic here length--;
+      length--;
       UART_OutChar(character); // Instructor defined function, no change
     }
 
     // Default accept
     character = UART_InChar();
+    if (character == CR)
+      break;
   }
   return number;
 }
@@ -127,6 +137,11 @@ void UART_OutUDec(uint32_t n) {
   //   of unspecified length as an ASCII string
 
   /* convert n to ASCII and sent */
+  if (n > 0) {
+    UART_OutUDec(n / 10);
+    char a = n % 10 + '0';
+    UART_OutChar(a);
+  }
 }
 
 // you can add more functions below
