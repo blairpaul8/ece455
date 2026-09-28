@@ -67,6 +67,28 @@ int main() {
 
     while (1) {
       // The code for Part 2C comes here
+      unsigned long sw = Switch_In();
+
+      if (sw == 0x00){ // no press, no sound 
+        //
+        NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
+
+      } else if (sw == 0x01){ // SW1 only, 1 kHz
+
+        NVIC_ST_RELOAD_R = 3125 - 1; // 3125 = 1KHZ period, 50,000,000 / (1000 * 16)
+        NVIC_ST_CURRENT_R = 0;
+        NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
+      } else if (sw == 0x02){ // SW2 only, 2kHz 
+
+        NVIC_ST_RELOAD_R = 1563 - 1; // 1563 = 2kHz period, 50,000,000 / (2000 * 16)
+        NVIC_ST_CURRENT_R = 0;
+        NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
+
+      } else { // both pressed, no sound
+
+        NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
+
+      }
     }
   }
 
