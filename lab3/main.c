@@ -145,8 +145,10 @@ uint32_t convert_input(char a, uint32_t input) {
     retval = input * .10;
     break;
   case '1':
+    retval = input / 100;
     break;
   case '2':
+    retval = input * 100;
     break;
   default:
     UART_printf("Invalid argument to convert_input.");
