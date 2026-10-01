@@ -48,3 +48,5 @@ void Sound_Init(unsigned long period);
 // Input: 3-bit data, 0 to 7 
 // Output: none
 void DAC_Out(unsigned long data);
+
+void play_note(unsigned long freq);

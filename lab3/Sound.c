@@ -84,4 +84,10 @@ void SysTick_Handler(void){
 	// Pass shortwave samples for Piano - in Part 3
 }
 
+void play_note(unsigned long freq){
 
+
+        NVIC_ST_RELOAD_R = (50000000 / (freq * 16)) - 1;
+        NVIC_ST_CURRENT_R = 0;
+        NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
+}

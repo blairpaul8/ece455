@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 // Change this number to the current part of the lab you are working on
-#define LAB_PART 1 // 1 for Part1, 2 for Part 2, 3 for Part 3
+#define LAB_PART 2 // 1 for Part1, 2 for Part 2, 3 for Part 3
 
 // basic functions defined at end of startup.s
 void DisableInterrupts(void); // Disable interrupts
@@ -102,17 +102,9 @@ int main() {
         NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
 
       } else if (sw == 0x01) { // SW1 only, 1 kHz
-
-        NVIC_ST_RELOAD_R =
-            3125 - 1; // 3125 = 1KHZ period, 50,000,000 / (1000 * 16)
-        NVIC_ST_CURRENT_R = 0;
-        NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
+          play_note(1000);
       } else if (sw == 0x02) { // SW2 only, 2kHz
-
-        NVIC_ST_RELOAD_R =
-            1563 - 1; // 1563 = 2kHz period, 50,000,000 / (2000 * 16)
-        NVIC_ST_CURRENT_R = 0;
-        NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE;
+          play_note(2000);
 
       } else { // both pressed, no sound
 
