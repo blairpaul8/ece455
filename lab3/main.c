@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 // Change this number to the current part of the lab you are working on
-#define LAB_PART 2 // 1 for Part1, 2 for Part 2, 3 for Part 3
+#define LAB_PART 3 // 1 for Part1, 2 for Part 2, 3 for Part 3
 
 // basic functions defined at end of startup.s
 void DisableInterrupts(void); // Disable interrupts
