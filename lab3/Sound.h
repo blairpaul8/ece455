@@ -49,4 +49,7 @@ void Sound_Init(unsigned long period);
 // Output: none
 void DAC_Out(unsigned long data);
 
-void play_note(unsigned long freq);
+// **************play_note*********************
+// Start a tone. Input: SysTick period in bus cycles -- the note
+// symbols defined above are already in these units.
+void play_note(unsigned long period);

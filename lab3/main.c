@@ -102,9 +102,9 @@ int main() {
         NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
 
       } else if (sw == 0x01) { // SW1 only, 1 kHz
-          play_note(1000);
+          play_note(3125);  // 1 kHz: 50 MHz / (16 * 1000)
       } else if (sw == 0x02) { // SW2 only, 2kHz
-          play_note(2000);
+          play_note(1562);  // 2 kHz: 50 MHz / (16 * 2000)
 
       } else { // both pressed, no sound
 
@@ -116,15 +116,42 @@ int main() {
   // Part 3 Begins
   else if (LAB_PART == 3) {
 
-    // Initalize UART
-    // Initialize DAC
+    UART_Init();
+    Sound_Init(C0);
+    NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
+    EnableInterrupts();
+
+    UART_printf("Piano ready: c d e g");
+    Newline();
 
     while (1) {
-      // The code should demonstrate Part 3
+      char key = UART_InChar();
+
+      switch (key) {
+      case 'c':
+      case 'C':
+        play_note(C0);  // 523.251 Hz
+        break;
+      case 'd':
+      case 'D':
+        play_note(D);  // 587.330 Hz
+        break;
+      case 'e':
+      case 'E':
+        play_note(E);  // 659.255 Hz
+        break;
+      case 'g':
+      case 'G':
+        play_note(G);  // 783.991 Hz
+        break;
+      default:
+        NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
+        break;
+      }
     }
   }
 
-  // Shouldn't reach unless you set an incorrect value for LAB_PART
+
   else
     return 0;
 }
