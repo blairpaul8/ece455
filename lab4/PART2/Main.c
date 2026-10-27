@@ -36,7 +36,11 @@ int main(void){
   while(1){
     // Is "Flag" set?
     // If yes, then clear Flag and print the value using UART_printf
-
+    if(Flag){
+      Flag = 0;
+      UART_printf(String);
+      UART_printf((unsigned char *)"\r\n");
+    }
   }
 }
 
@@ -51,8 +55,7 @@ int main(void){
 // Input: sample  12-bit ADC sample
 // Output: 32-bit distance (resolution 0.001 cm)
 unsigned long Convert(unsigned long sample){
-
-  return 0; // replace this line with your solution
+return (sample * Size * 100 + 4095/2) / 4095; 
 }
 
 // Initialize SysTick interrupts to trigger at 2 Hz, 500 ms.
@@ -60,16 +63,19 @@ unsigned long Convert(unsigned long sample){
 // Output: none
 void SysTick_Init_Interrupts(unsigned long period){
   // disable SysTick during setup
+  NVIC_ST_CTRL_R = 0;
 
   // reload value
-  
+  NVIC_ST_RELOAD_R = period - 1;
+
   // clear the current value
-  
+  NVIC_ST_CURRENT_R = 0;
+
   // set the priority 2
-  
+  NVIC_SYS_PRI3_R = (NVIC_SYS_PRI3_R & 0x00FFFFFF) | 0x40000000;
+
   // enable SysTick with the core clock and interrupts
-  
-  (void)period;
+  NVIC_ST_CTRL_R = 0x07;
 }
 
 // Executes every 500 ms: collect a sample, convert it, store it in the mailbox.
@@ -77,6 +83,17 @@ void SysTick_Init_Interrupts(unsigned long period){
 // ConvertDistancetostring(), and set the global Flag before exiting.
 void SysTick_Handler(void){
 
+// read the 12-bit sample from PE2
+ADCvalue = ADC0_In();
+
+// convert to 0.001 cm units
+Distance = Convert(ADCvalue);
+
+// fill the global String[]
+ConvertDistancetostring(Distance);
+
+// tell main a new value is ready
+ Flag = 1;
 }
 
 /*------------ Instructor written function ------------*/
