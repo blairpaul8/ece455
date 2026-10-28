@@ -14,7 +14,7 @@
 #include "tm4c123gh6pm.h"
 
 // Global declarations
-unsigned long Size = 1000;                // potentiometer travel in mm; change it to match your part
+unsigned long Size = 20;                // potentiometer travel in mm; change it to match your part
 unsigned char String[10];              // string to output to the screen
 unsigned long Distance;                // potentiometer distance in units of 0.001 cm
 unsigned long ADCvalue;                // 12-bit 0 to 4095 sample
@@ -55,7 +55,7 @@ int main(void){
 // Input: sample  12-bit ADC sample
 // Output: 32-bit distance (resolution 0.001 cm)
 unsigned long Convert(unsigned long sample){
-return (sample * Size * 100 + 4095/2) / 4095; 
+return (sample * 100 * Size) / 4095; 
 }
 
 // Initialize SysTick interrupts to trigger at 2 Hz, 500 ms.
