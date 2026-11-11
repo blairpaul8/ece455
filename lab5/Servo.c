@@ -33,27 +33,42 @@ void DelayWait10ms(uint32_t n);   // in lab5.c, busy-wait, n times 10 ms
 // Input: period and duty in PWM clock ticks, duty < period
 void PWM0_Init(uint16_t period, uint16_t duty){
   // 1) activate PWM0 and port B
-
+  SYSCTL_RCGCPWM_R |= 0x01;             // 1) activate PWM0
+  SYSCTL_RCGCGPIO_R |= 0x02;            // 2) activate port B
+  while((SYSCTL_PRGPIO_R&0x02) == 0){};
   // 2) PB6: alternate function, PCTL = M0PWM0, digital enable
-  
+  GPIO_PORTB_AFSEL_R |= 0x40;           // enable alt funct on PB6
+  GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x04000000; // PWM0
+  GPIO_PORTB_AMSEL_R &= ~0x40;          // disable analog fun on PB6
+  GPIO_PORTB_DEN_R |= 0x40;             // enable digital I/O on PB6
   // 3) SYSCTL_RCC_R: use the PWM divider, choose the divisor
-  
+  SYSCTL_RCC_R = 0x001A0000 |           // 3) use PWM divider
+    (SYSCTL_RCC_R & (~0x000E0000));     //    configure for /64 divider
   // 4) generator 0: down-counting mode; GENA low on LOAD, high on CMPA down
-  
-  // 5) LOAD = period - 1;  
-  
+  PWM0_0_CTL_R = 0;                     // 4) re-loading down-counting mode
+  PWM0_0_GENA_R = 0xC8;                 // low on LOAD, high on CMPA down
+  // 5) LOAD = period - 1;
+  PWM0_0_LOAD_R = period - 1;           // 5) cycles needed to count down to 0
   // 6) CMPA = duty - 1
-  
+  PWM0_0_CMPA_R = duty - 1;             // 6) count value when output rises
   // 7) start generator 0 and enable the M0PWM0 output
-  
-  (void)period; (void)duty;
+  PWM0_0_CTL_R |= 0x00000001;           // 7) start PWM0
+  PWM0_ENABLE_R |= 0x00000001;          // enable PB6/M0PWM0
 }
 
 // Set the pulse width in microseconds. Enforce SERVO_MIN_US and SERVO_MAX_US here,
 // before the value reaches the register. Returns the width actually applied.
 uint32_t PWM0_SetPulseWidth(uint32_t microseconds){
+  if(microseconds < SERVO_MIN_US){
+    microseconds = SERVO_MIN_US;
+  }
+  if(microseconds > SERVO_MAX_US){
+    microseconds = SERVO_MAX_US;
+  }
 
-  return microseconds; // replace this line with your solution
+  PWM0_0_CMPA_R = (microseconds*1000/PWM_TICK_NS) - 1; // 6) count value when output rises
+
+  return microseconds;
 }
 
 // ======================= Part 3B: input capture =======================
@@ -61,24 +76,52 @@ uint32_t PWM0_SetPulseWidth(uint32_t microseconds){
 
 void Capture_Init(void){
   // 1) activate Timer1 and port B; PB4 input, alternate function, PCTL = T1CCP0
-  
+  SYSCTL_RCGCTIMER_R |= 0x02;      // activate timer1
+  SYSCTL_RCGCGPIO_R |= 0x02;       // activate port B
+  First = 0;                       // first will be wrong
+  Count = 0;                       // set on subsequent
+  GPIO_PORTB_DIR_R &= ~0x10;       // make PB4 input
+  GPIO_PORTB_AFSEL_R |= 0x10;      // enable alt funct on PB4
+  GPIO_PORTB_DEN_R |= 0x10;        // configure PB4 as T1CCP0
+  GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xFFF0FFFF)+0x00070000;
+
   // 2) disable Timer1A; 16-bit mode; TAMR: capture, edge-time, count direction
+  TIMER1_CTL_R &= ~0x00000001;     // disable timer1A during setup
+  TIMER1_CFG_R = 0x00000004;       // configure for 16-bit capture mode
+  TIMER1_TAMR_R = 0x00000007;      // configure for edge event
   
   // 3) CTL: both edges; TAILR = 0xFFFF; TAPR = 0xFF (24-bit range)
-  
-  // 4) enable the capture-event interrupt (IMR), clear ICR
-  
-  // 5) NVIC: Timer1A is interrupt 21 (NVIC_EN0_R bit 21), priority in NVIC_PRI5_R
-  
-  // 6) enable Timer1A
+  TIMER1_CTL_R |= 0x0000000C;      // both edges
+  TIMER1_TAILR_R = 0x0000FFFF;     // start value
+  TIMER1_TAPR_R = 0xFF;            // activate prescale, creating 24-bit
 
+  // 4) enable the capture-event interrupt (IMR), clear ICR
+  TIMER1_IMR_R |= 0x00000004;      // enable capture match interrupt
+  TIMER1_ICR_R = 0x00000004;       // clear timer1A capture match flag
+
+  // 5) NVIC: Timer1A is interrupt 21 (NVIC_EN0_R bit 21), priority in NVIC_PRI5_R
+  NVIC_PRI5_R = (NVIC_PRI5_R&0xFFFF00FF)|0x00004000; // Timer1A=priority 2
+  NVIC_EN0_R = 1<<21;              // enable interrupt 21 in NVIC
+
+  // 6) enable Timer1A
+  TIMER1_CTL_R |= 0x00000001;      // timer1A 24-b, both edges, interrupts
+  EnableInterrupts();
 }
 
 // Both edges arrive here. Decide which edge it was (read PB4), timestamp it,
 // and compute the pulse width (rising to falling) and the period (rising to rising).
 void Timer1A_Handler(void){
   // acknowledge the capture event (TIMER1_ICR_R)
-
+  TIMER1_ICR_R = 0x00000004;       // acknowledge timer1A capture
+  if(GPIO_PORTB_DATA_R&0x10){      // PB4 high, rising edge
+    Period = (First - TIMER1_TAR_R)&0x00FFFFFF; // 12.5ns resolution
+    First = TIMER1_TAR_R;          // setup for next
+  } 
+  
+  else{                           // PB4 low, falling edge
+    PulseWidth = (First - TIMER1_TAR_R)&0x00FFFFFF; // from rise to fall
+    Count = Count + 1;
+  }
 }
 
 uint32_t Capture_PulseWidth_us(void){    return 0; } // replace with your solution
