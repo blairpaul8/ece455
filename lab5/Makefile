@@ -10,13 +10,13 @@ CFLAGS = -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard \
          -ffunction-sections -fdata-sections -MD -std=c99 -Wall
 
 LDFLAGS = -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard \
-          -nostartfiles -static -Wl,--gc-sections \
+          -nostartfiles -specs=nosys.specs -static -Wl,--gc-sections \
           -T tm4c123g.ld \
           -L$(TIVAWARE)/driverlib/gcc
 
 LIBS = -ldriver -lm -lc -lgcc
 
-OBJS = lab5.o Servo.o PLL.o startup_gcc.o fixed.o
+OBJS = lab5.o PLL.o startup_gcc.o fixed.o ST7735.o
 
 all: blink.bin
 

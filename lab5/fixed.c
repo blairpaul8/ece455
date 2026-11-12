@@ -19,6 +19,8 @@
 #include "ST7735.h"
 #include "fixed.h"
 
+extern uint16_t StTextColor;
+
 static int32_t xMin, xMax, yMin, yMax;   // the plot window, resolution 0.001
 
 /****************ST7735_sDecOut3***************
@@ -36,12 +38,32 @@ Parameter LCD display
     31    " 0.031"
 -12345    " *.***"
  */
-void ST7735_sDecOut3(int32_t n){
+void ST7735_sDecOut3(int32_t n) {
   // 1) out of range: output " *.***" and return
+  if((n > 9999) || (n < -9999)) {
+    ST7735_OutChar(' ');
+    ST7735_OutChar('*');
+    ST7735_OutChar('.');
+    ST7735_OutChar('*');
+    ST7735_OutChar('*');
+    ST7735_OutChar('*');
+    return;
+  }
+
   // 2) output '-' and negate if negative, else output ' '
-  // 3) extract each digit (add '0' to get its ASCII code) and output it with
-  //    ST7735_OutChar(): units, '.', tenths, hundredths, thousandths
-  (void)n;
+  if(n < 0) {
+    ST7735_OutChar('-');
+    n = -n;
+  } else {
+    ST7735_OutChar(' ');
+  }
+
+  // 3) extract each digit and output it
+  ST7735_OutChar((n / 1000) + '0');        // units
+  ST7735_OutChar('.');
+  ST7735_OutChar(((n / 100) % 10) + '0');  // tenths
+  ST7735_OutChar(((n / 10) % 10) + '0');   // hundredths
+  ST7735_OutChar((n % 10) + '0');          // thousandths
 }
 
 /**************ST7735_uBinOut8***************
@@ -65,13 +87,43 @@ Parameter LCD display
 255997	  "999.99"
 256000	  "***.**"
 */
-void ST7735_uBinOut8(uint32_t n){
+void ST7735_uBinOut8(uint32_t n) {
+  uint32_t h, ip, fp;
+
   // 1) out of range: output "***.**" and return
-  // 2) the resolution is 1/256 = 2^-8, so the low 8 bits are the fraction;
-  //    convert the fraction to two decimal places (times 100, divide by 256)
-  // 3) integer part as three characters with leading blanks, not leading zeros
-  // 4) '.', then the two fraction digits
-  (void)n;
+  if(n >= 256000){
+    ST7735_OutChar('*');
+    ST7735_OutChar('*');
+    ST7735_OutChar('*');
+    ST7735_OutChar('.');
+    ST7735_OutChar('*');
+    ST7735_OutChar('*');
+    return;
+  }
+
+  // 2) n/256 in hundredths, rounded: (n*100 + 128) / 256
+  h = (n * 100 + 128) / 256;
+  if(h > 99999) h = 99999;      // 255999 would round up to 1000.00
+  ip = h / 100;                 // integer part, 0..999
+  fp = h % 100;                 // fraction, 0..99
+
+  // 3) integer part, three characters, leading blanks
+  if(ip >= 100){
+    ST7735_OutChar((ip / 100) + '0');
+    ST7735_OutChar(((ip / 10) % 10) + '0');
+  } else if(ip >= 10){
+    ST7735_OutChar(' ');
+    ST7735_OutChar((ip / 10) + '0');
+  } else {
+    ST7735_OutChar(' ');
+    ST7735_OutChar(' ');
+  }
+  ST7735_OutChar((ip % 10) + '0');
+
+  // 4) '.', then two fraction digits
+  ST7735_OutChar('.');
+  ST7735_OutChar((fp / 10) + '0');
+  ST7735_OutChar((fp % 10) + '0');
 }
 
 /**************ST7735_XYplotInit***************
@@ -85,11 +137,18 @@ void ST7735_uBinOut8(uint32_t n){
  Outputs: none
  assumes minX < maxX, and miny < maxY
 */
-void ST7735_XYplotInit(char *title, int32_t minX, int32_t maxX, int32_t minY, int32_t maxY){
-  // Fill the screen with black (ST7735_FillScreen)
-  // Set the cursor to (0,0) and print the title in white (ST7735_SetTextColor,
-  // ST7735_OutString), then restore the text colour
-  (void)title;
+void ST7735_XYplotInit(char *title, int32_t minX, int32_t maxX, int32_t minY, int32_t maxY) {
+  uint16_t oldColor = StTextColor;       // save current text colour
+
+  // Fill the screen with black
+  ST7735_FillRect(0, 32, 128, 128, ST7735_BLACK);
+
+  // Cursor to (0,0), print title in white, then restore the text colour
+  ST7735_SetCursor(0, 0);
+  ST7735_SetTextColor(ST7735_WHITE);
+  ST7735_OutString(title);
+  ST7735_SetTextColor(oldColor);
+
   // No change to the following four lines
   xMin = minX;
   xMax = maxX;
@@ -106,11 +165,24 @@ void ST7735_XYplotInit(char *title, int32_t minX, int32_t maxX, int32_t minY, in
  assumes ST7735_XYplotInit has been previously called
  neglect any points outside the minX maxY minY maxY bounds
 */
-void ST7735_XYplot(uint32_t num, int32_t bufX[], int32_t bufY[]){
-  // For each point inside the window:
-  //   a = (bufX[i] - xMin) * 127 / (xMax - xMin)          pixel column, 0 to 127
-  //   b = (yMax - bufY[i]) * 127 / (yMax - yMin) + 32     pixel row, 32 to 159 (the
-  //                                                       title takes the top 32 rows)
-  //   ST7735_DrawPixel(a, b, ST7735_RED)
-  (void)num; (void)bufX; (void)bufY; (void)xMin; (void)xMax; (void)yMin; (void)yMax;
+void ST7735_XYplot(uint32_t num, int32_t bufX[], int32_t bufY[]) {
+  uint32_t i;
+  int32_t x, y;
+  int32_t a, b;
+
+  for(i = 0; i < num; i++){
+    x = bufX[i];
+    y = bufY[i];
+
+    // neglect points outside the window
+    if((x < xMin) || (x > xMax) || (y < yMin) || (y > yMax)){
+      continue;
+    }
+
+    // pixel column 0..127 and pixel row 32..159 (title uses the top 32 rows)
+    a = (int32_t)(((int64_t)(x - xMin) * 127) / (xMax - xMin));
+    b = (int32_t)(((int64_t)(yMax - y) * 127) / (yMax - yMin)) + 32;
+
+    ST7735_DrawPixel(a, b, ST7735_RED);
+  }
 }

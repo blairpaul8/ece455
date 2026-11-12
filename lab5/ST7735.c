@@ -67,9 +67,9 @@
 // CS   - PA3 TFT_CS, active low to enable TFT
 // *CS  - (NC) SDC_CS, active low to enable SDC
 // MISO - (NC) MISO SPI data from SDC to microcontroller
-// SDA  – (NC) I2C data for ADXL345 accelerometer
-// SCL  – (NC) I2C clock for ADXL345 accelerometer
-// SDO  – (NC) I2C alternate address for ADXL345 accelerometer
+// SDA  ï¿½ (NC) I2C data for ADXL345 accelerometer
+// SCL  ï¿½ (NC) I2C clock for ADXL345 accelerometer
+// SDO  ï¿½ (NC) I2C alternate address for ADXL345 accelerometer
 // Backlight + - Light, backlight connected to +3.3 V
 
 // **********wide.hk ST7735R with ADXL335 accelerometer *******************
@@ -83,9 +83,9 @@
 // CS   - PA3 TFT_CS, active low to enable TFT
 // *CS  - (NC) SDC_CS, active low to enable SDC
 // MISO - (NC) MISO SPI data from SDC to microcontroller
-// X– (NC) analog input X-axis from ADXL335 accelerometer
-// Y– (NC) analog input Y-axis from ADXL335 accelerometer
-// Z– (NC) analog input Z-axis from ADXL335 accelerometer
+// Xï¿½ (NC) analog input X-axis from ADXL335 accelerometer
+// Yï¿½ (NC) analog input Y-axis from ADXL335 accelerometer
+// Zï¿½ (NC) analog input Z-axis from ADXL335 accelerometer
 // Backlight + - Light, backlight connected to +3.3 V
 
 #include <stdio.h>
@@ -1564,6 +1564,8 @@ void ST7735_OutString(char *ptr){
 void ST7735_SetTextColor(uint16_t color){
   StTextColor = color;
 }
+
+#ifndef __GNUC__
 // Print a character to ST7735 LCD.
 int fputc(int ch, FILE *f){
   ST7735_OutChar(ch);
@@ -1578,6 +1580,52 @@ int ferror(FILE *f){
   /* Your implementation of ferror */
   return EOF;
 }
+#else
+#include <stdarg.h>
+// minimal printf straight to the LCD: %d %u %c %s %% only, no newlib stdio
+int printf(const char *fmt, ...){
+  va_list ap;
+  int count = 0;
+  va_start(ap, fmt);
+  while(*fmt){
+    if(*fmt != '%'){
+      ST7735_OutChar(*fmt++);
+      count++;
+      continue;
+    }
+    fmt++;                                   // skip '%'
+    switch(*fmt){
+      case 'd': {
+        int32_t v = va_arg(ap, int32_t);
+        if(v < 0){
+          ST7735_OutChar('-');
+          ST7735_OutUDec((uint32_t)(-(v + 1)) + 1u);   // safe for INT32_MIN
+        } else{
+          ST7735_OutUDec((uint32_t)v);
+        }
+        break;
+      }
+      case 'u':
+        ST7735_OutUDec(va_arg(ap, uint32_t));
+        break;
+      case 'c':
+        ST7735_OutChar((char)va_arg(ap, int));
+        break;
+      case 's':
+        ST7735_OutString(va_arg(ap, char *));
+        break;
+      case '%':
+        ST7735_OutChar('%');
+        break;
+      default:
+        break;
+    }
+    if(*fmt) fmt++;
+  }
+  va_end(ap);
+  return count;
+}
+#endif
 // Abstraction of general output device
 // Volume 2 section 3.4.5
 

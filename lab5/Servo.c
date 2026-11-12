@@ -78,8 +78,8 @@ void Capture_Init(void){
   // 1) activate Timer1 and port B; PB4 input, alternate function, PCTL = T1CCP0
   SYSCTL_RCGCTIMER_R |= 0x02;      // activate timer1
   SYSCTL_RCGCGPIO_R |= 0x02;       // activate port B
-  First = 0;                       // first will be wrong
-  Count = 0;                       // set on subsequent
+  int First = 0;                       // first will be wrong
+  int Count = 0;                       // set on subsequent
   GPIO_PORTB_DIR_R &= ~0x10;       // make PB4 input
   GPIO_PORTB_AFSEL_R |= 0x10;      // enable alt funct on PB4
   GPIO_PORTB_DEN_R |= 0x10;        // configure PB4 as T1CCP0
