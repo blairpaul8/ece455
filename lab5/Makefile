@@ -16,7 +16,7 @@ LDFLAGS = -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard \
 
 LIBS = -ldriver -lm -lc -lgcc
 
-OBJS = lab5.o PLL.o startup_gcc.o fixed.o ST7735.o
+OBJS = lab5.o PLL.o startup_gcc.o fixed.o ST7735.o Servo.o interrupts.o
 
 all: blink.bin
 
