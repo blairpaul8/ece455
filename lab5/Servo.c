@@ -149,7 +149,7 @@ uint32_t Capture_Count(void){            return Count; }
 //                seconds each, forever, and show on the LCD what the input capture
 //                measured: the commanded width, the measured width and period in
 //                microseconds, the measured width in timer ticks, and the pulse count.
-#define LAB_STAGE 1
+#define LAB_STAGE 2
 
 // One LCD line: label, number, and spaces so a shorter number overwrites a longer one
 static void ShowLine(uint32_t line, char *label, uint32_t value){

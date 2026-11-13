@@ -3,7 +3,7 @@
 // LAB_PART 3: the servo program in Servo.c (Part 3); main hands over to Servo_Main.
 // Apart from that switch and the two lines it adds to main, this file is lab5's own
 // and needs no change.
-#define LAB_PART 2
+#define LAB_PART 3
 
 // Uses ST7735.c LCD.
 
