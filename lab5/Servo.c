@@ -73,16 +73,26 @@ uint32_t PWM0_SetPulseWidth(uint32_t microseconds){
 
 // ======================= Part 3B: input capture =======================
 // Timer1A on PB4 (T1CCP0), edge-time mode, both edges. Section 6.1.4.
+void EnableInterrupts(void);
+
+volatile uint32_t First;
+volatile uint32_t Period;
+volatile uint32_t PulseWidth;
+volatile uint32_t Count;
 
 void Capture_Init(void){
   // 1) activate Timer1 and port B; PB4 input, alternate function, PCTL = T1CCP0
   SYSCTL_RCGCTIMER_R |= 0x02;      // activate timer1
   SYSCTL_RCGCGPIO_R |= 0x02;       // activate port B
-  int First = 0;                       // first will be wrong
-  int Count = 0;                       // set on subsequent
+  while((SYSCTL_PRGPIO_R&0x02) == 0){}; // wait for port B clock
+  First = 0;                       // first measurement will be wrong
+  Period = 0;
+  PulseWidth = 0;
+  Count = 0;                       // set on subsequent
   GPIO_PORTB_DIR_R &= ~0x10;       // make PB4 input
   GPIO_PORTB_AFSEL_R |= 0x10;      // enable alt funct on PB4
-  GPIO_PORTB_DEN_R |= 0x10;        // configure PB4 as T1CCP0
+  GPIO_PORTB_AMSEL_R &= ~0x10;     // disable analog on PB4
+  GPIO_PORTB_DEN_R |= 0x10;        // enable digital I/O on PB4
   GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xFFF0FFFF)+0x00070000;
 
   // 2) disable Timer1A; 16-bit mode; TAMR: capture, edge-time, count direction
@@ -112,22 +122,23 @@ void Capture_Init(void){
 // and compute the pulse width (rising to falling) and the period (rising to rising).
 void Timer1A_Handler(void){
   // acknowledge the capture event (TIMER1_ICR_R)
+  uint32_t now;
   TIMER1_ICR_R = 0x00000004;       // acknowledge timer1A capture
+  now = TIMER1_TAR_R;              // edge time (prescaler in bits 23:16), read once
+  // Timer counts down, so elapsed = earlier - later, masked to 24 bits for rollover
   if(GPIO_PORTB_DATA_R&0x10){      // PB4 high, rising edge
-    Period = (First - TIMER1_TAR_R)&0x00FFFFFF; // 12.5ns resolution
-    First = TIMER1_TAR_R;          // setup for next
-  } 
-  
-  else{                           // PB4 low, falling edge
-    PulseWidth = (First - TIMER1_TAR_R)&0x00FFFFFF; // from rise to fall
-    Count = Count + 1;
+    Period = (First - now)&0x00FFFFFF; // rise to rise, 12.5ns resolution
+    First = now;                   // setup for next
+  }else{                           // PB4 low, falling edge
+    PulseWidth = (First - now)&0x00FFFFFF; // from rise to fall
+    Count = Count + 1;             // one complete pulse measured
   }
 }
 
-uint32_t Capture_PulseWidth_us(void){    return 0; } // replace with your solution
-uint32_t Capture_Period_us(void){        return 0; } // replace with your solution
-uint32_t Capture_PulseWidth_ticks(void){ return 0; } // replace with your solution
-uint32_t Capture_Count(void){            return 0; } // replace with your solution
+uint32_t Capture_PulseWidth_us(void){    return (PulseWidth + 40)/80; }
+uint32_t Capture_Period_us(void){        return (Period + 40)/80; }
+uint32_t Capture_PulseWidth_ticks(void){ return PulseWidth; }
+uint32_t Capture_Count(void){            return Count; }
 
 
 // ======================= Part 3 main (instructor given, complete) =======================
