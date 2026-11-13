@@ -135,10 +135,21 @@ void Timer1A_Handler(void){
   }
 }
 
-uint32_t Capture_PulseWidth_us(void){    return (PulseWidth + 40)/80; }
-uint32_t Capture_Period_us(void){        return (Period + 40)/80; }
-uint32_t Capture_PulseWidth_ticks(void){ return PulseWidth; }
-uint32_t Capture_Count(void){            return Count; }
+uint32_t Capture_PulseWidth_us(void){    
+  return (PulseWidth + 40)/80; 
+}
+
+uint32_t Capture_Period_us(void){        
+  return (Period + 40)/80; 
+}
+
+uint32_t Capture_PulseWidth_ticks(void){ 
+  return PulseWidth; 
+}
+
+uint32_t Capture_Count(void){            
+  return Count;
+}
 
 
 // ======================= Part 3 main (instructor given, complete) =======================
